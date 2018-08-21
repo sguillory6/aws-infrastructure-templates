@@ -1,3 +1,9 @@
+# The variables used in the vpc template are named with the following convention
+#   Variables that start with a c are conditions
+#   Variables that start with a p are parameters
+#   Variables that start with a r are resources
+#   Variables that do not start with the above are outputs
+
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Creates VPC and its base resources, across 3 AZs: VPC, Subnets, Routes tables, and NACLs.'
 

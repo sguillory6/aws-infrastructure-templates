@@ -8,19 +8,43 @@ VPC
 ---
 
 The vpc.yml template can be used to create a VPC. The VPC template will generate the following resources:
-- VPC
-- Public subnets in up to 3 AZs - Used for access to services from public internet and host the NAT Gateway
+* VPC
+* Public subnets in up to 3 AZs - Used for access to services from public internet and host the NAT Gateway
   for servers in public and management subnets to access internet.
-- Private subnets in up to 3 AZs - User for services that will only be accessed from SWA or public subnets.
-- Data subnets in up to 3 AZs - Used for running data services such as RDS or Gemfire. Should only be accessible from private subnets.
-- Management Subnets in up to 3 AZs - Used for management of other subnets such as bastion hosts.
-- Route tables and default entries for each subnet created
-- NACLs
-- Default SSH security group
+* Private subnets in up to 3 AZs - User for services that will only be accessed from SWA or public subnets.
+* Data subnets in up to 3 AZs - Used for running data services such as RDS or Gemfire. Should only be accessible from private subnets.
+* Management Subnets in up to 3 AZs - Used for management of other subnets such as bastion hosts.
+* Route tables and default entries for each subnet created
+* NACLs
+* Default SSH security group
+
+**Template naming convention**
+
+The variables used in the vpc template are named with the following convention
+
+* Variables that start with a `c` are conditions
+* Variables that start with a `p` are parameters
+* Variables that start with a `r` are resources
+* Variables that do not start with the above are outputs
+
 
 #### Creating VPC stack
 The following is an example of how to use the cloudformation template to generate a VPC. This call
 will create a VPC with all 4 subnet tiers in all 3 availability zones.
+
+You will need to replace the following paramters with valid values
+* `stack-name` - the name you wish to call your vpc stack
+* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
+* `parameter-overrides` - see parameters section below
+* `tags`
+  * `SWA:Name` - Use the same value as the `stack-name`
+  * `SWA:CostCenter` - The cost center for this application
+  * `SWA:PID` - The PID for this application
+  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
+  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
+  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
+  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
+
 
 ```
 aws cloudformation deploy \
@@ -49,8 +73,15 @@ aws cloudformation deploy \
     'pPublSubAz3=10.65.65.144/28' \
     'pPrivSubAz3=10.65.65.160/28' \
     'pDataSubAz3=10.65.65.176/28' \
-    'pMgmtSubAz3=10.65.65.192/28'
-
+    'pMgmtSubAz3=10.65.65.192/28' \
+  --tags \
+    'SWA:Name=vpc-stack-name' \
+    'SWA:CostCenter=123456' \
+    'SWA:PID=IT-00000' \
+    'SWA:Confidentiality='SWA Confidential'' \
+    'SWA:Compliance=PII' \
+    'SWA:BusinessService=CheckIn' \
+    'SWA:Environment=dev'
 ```
 
 #### Template parameters
