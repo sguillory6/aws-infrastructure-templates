@@ -114,5 +114,5 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 | pMgmtSubAz3 | Management Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | pConfigureDirectConnect | Configure resources to use Direct Connect | **true** or **false**<br><br>If lab environment, DX will never be created | false | false |
 | pCsrPreferredPath | The preferred network path between VPC and SWA | **CSR1** or **CSR2** | false | CSR1 |
-| pInitiateSpoke | Create connection to direct connect | **true** or **false** | false | false |
+| pInitiateSpoke | Create connection to direct connect | **true** or **false** | false | true |
 

@@ -208,7 +208,7 @@ Parameters:
   pInitiateSpoke:
     Type: String
     Description: 'initiate connection to direct connect'
-    Default: false
+    Default: true
     AllowedValues:
       - true
       - false
