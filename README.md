@@ -78,7 +78,7 @@ aws cloudformation deploy \
     'SWA:Name=vpc-stack-name' \
     'SWA:CostCenter=123456' \
     'SWA:PID=IT-00000' \
-    'SWA:Confidentiality='SWA Confidential'' \
+    'SWA:Confidentiality=SWA Confidential' \
     'SWA:Compliance=PII' \
     'SWA:BusinessService=CheckIn' \
     'SWA:Environment=dev'
