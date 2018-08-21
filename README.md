@@ -53,7 +53,7 @@ aws cloudformation deploy \
   --s3-bucket my-bucket \
   --s3-prefix vpc-template \
   --parameter-overrides \
-    'pVpcCidrBlock=10.65.65.0/24' \
+    'pVpcCidrBlock=100.65.65.0/24' \
     'pAppName=my-app' \
     'pEnvName=dev' \
     'pCostCenter=123456' \
@@ -62,18 +62,18 @@ aws cloudformation deploy \
     'pCompliance=PII' \
     'pBusinessService=CheckIn' \
     'pConfigureDirectConnect=false' \
-    'pPublSubAz1=10.65.65.0/28' \
-    'pPrivSubAz1=10.65.65.16/28' \
-    'pDataSubAz1=10.65.65.32/28' \
-    'pMgmtSubAz1=10.65.65.48/28' \
-    'pPublSubAz2=10.65.65.64/28' \
-    'pPrivSubAz2=10.65.65.80/28' \
-    'pDataSubAz2=10.65.65.96/28' \
-    'pMgmtSubAz2=10.65.65.128/28' \
-    'pPublSubAz3=10.65.65.144/28' \
-    'pPrivSubAz3=10.65.65.160/28' \
-    'pDataSubAz3=10.65.65.176/28' \
-    'pMgmtSubAz3=10.65.65.192/28' \
+    'pPublSubAz1=100.65.65.0/28' \
+    'pPrivSubAz1=100.65.65.16/28' \
+    'pDataSubAz1=100.65.65.32/28' \
+    'pMgmtSubAz1=100.65.65.48/28' \
+    'pPublSubAz2=100.65.65.64/28' \
+    'pPrivSubAz2=100.65.65.80/28' \
+    'pDataSubAz2=100.65.65.96/28' \
+    'pMgmtSubAz2=100.65.65.128/28' \
+    'pPublSubAz3=100.65.65.144/28' \
+    'pPrivSubAz3=100.65.65.160/28' \
+    'pDataSubAz3=100.65.65.176/28' \
+    'pMgmtSubAz3=100.65.65.192/28' \
   --tags \
     'SWA:Name=vpc-stack-name' \
     'SWA:CostCenter=123456' \
