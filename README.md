@@ -116,3 +116,31 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 | pCsrPreferredPath | The preferred network path between VPC and SWA | **CSR1** or **CSR2** | false | CSR1 |
 | pInitiateSpoke | Create connection to direct connect | **true** or **false** | false | true |
 
+#### Outputs
+
+After the VPC stack has been generated, you will have the following outputs avaialble for use in other cloufrormation templates. `vpc-stack-name` indicates that the export key will start with the name that was given to vpc stack.
+
+|Output Key | Export Key | Description|
+|-----------|------------|------------|
+|VpcId | *\<vpc-stack-name>*-VpcId | The VPC ID of this VPC|
+|VpcCidrBlock | *\<vpc-stack-name>*-VpcCidrBlock | VPC CIDR Block|
+|PublicSubnet1Id | *\<vpc-stack-name>*-PubSub1Id | The ID of Public Subnet AZ 1|
+|PublicSubnet2Id | *\<vpc-stack-name>*-PubSub2Id | Public Subnet 2 ID|
+|PublicSubnet3Id | *\<vpc-stack-name>*-PubSub3Id | Public Subnet 3 ID|
+|PublicSubnetsRouteTable | *\<vpc-stack-name>*-PubRTId | Public Subnet Route Table ID|
+|PrivateSubnet1Id | *\<vpc-stack-name>*-PrivSub1Id | Private Subnet 1 ID|
+|PrivateSubnet2Id | *\<vpc-stack-name>*-PrivSub2Id | Private Subnet 2 ID|
+|PrivateSubnet3Id | *\<vpc-stack-name>*-PrivSub3Id | Private Subnet 3 ID|
+|PrivateSubnetRouteTableAZ1 | *\<vpc-stack-name>*-PrivRT1Id | Private Subnet Route Table ID of AZ 1|
+|PrivateSubnetRouteTableAZ2 | *\<vpc-stack-name>*-PrivRT2Id | Private Subnet Route Table ID of AZ 2|
+|PrivateSubnetRouteTableAZ3 | *\<vpc-stack-name>*-PrivRT3Id | Private Subnet Route Table ID of AZ 3|
+|ManagementSubnet1Id | *\<vpc-stack-name>*-MgmtSub1Id | Management Subnet 1 ID|
+|ManagementSubnet2Id | *\<vpc-stack-name>*-MgmtSub2Id | Management Subnet 2 ID|
+|ManagementSubnet3Id | *\<vpc-stack-name>*-MgmtSub3Id | Management Subnet 3 ID|
+|ManagementSubnetRouteTableAZ1 | *\<vpc-stack-name>*-MgmtRT1Id | Management Subnet Route Table ID of AZ 1|
+|ManagementSubnetRouteTableAZ2 | *\<vpc-stack-name>*-MgmtRT2Id | Management Subnet Route Table ID of AZ 2|
+|ManagementSubnetRouteTableAZ3 | *\<vpc-stack-name>*-MgmtRT3Id | Management Subnet Route Table ID of AZ 3|
+|DataSubnet1Id | *\<vpc-stack-name>*-DataSub1Id | Data Subnet 1 ID|
+|DataSubnet2Id | *\<vpc-stack-name>*-DataSub2Id | Data Subnet 2 ID|
+|DataSubnet3Id | *\<vpc-stack-name>*-DataSub3Id | Data Subnet 3 ID|
+|DataSubnetRouteTableAZ | *\<vpc-stack-name>*-DataRtId | Data Subnet Route Table ID|
