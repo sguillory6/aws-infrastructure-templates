@@ -11,12 +11,14 @@ The vpc.yml template can be used to create a VPC. The VPC template will generate
 * VPC
 * Public subnets in up to 3 AZs - Used for access to services from public internet and host the NAT Gateway
   for servers in public and management subnets to access internet.
-* Private subnets in up to 3 AZs - User for services that will only be accessed from SWA or public subnets.
+* Private subnets in up to 3 AZs - Used for services that will only be accessed from SWA or public subnets.
 * Data subnets in up to 3 AZs - Used for running data services such as RDS or Gemfire. Should only be accessible from private subnets.
 * Management Subnets in up to 3 AZs - Used for management of other subnets such as bastion hosts.
 * Route tables and default entries for each subnet created
 * NACLs
 * Default SSH security group
+* Elastic IPs - one for each Net Gateway in each of the 3 AZs
+* Optioanlly creates a VPN Gateway (VPG)
 
 **Template naming convention**
 
