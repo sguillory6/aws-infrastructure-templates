@@ -9,9 +9,8 @@ The variables used in the templates are named with the following convention
 
 * Variables that start with a `m` are mappings
 * Variables that start with a `c` are conditions
-* Variables that start with a `p` are parameters
 * Variables that start with a `r` are resources
-* Variables that do not start with the above are outputs
+* Variables that do not start with the above are parameters or outputs
 
 ## VPC
 
@@ -59,27 +58,27 @@ aws cloudformation deploy \
   --s3-bucket my-bucket \
   --s3-prefix vpc-template \
   --parameter-overrides \
-    'pVpcCidrBlock=100.65.65.0/24' \
-    'pAppName=my-app' \
-    'pEnvName=dev' \
-    'pCostCenter=12345' \
-    'pPID=IT-00000' \
-    'pConfidentiality=SWA Confidential' \
-    'pCompliance=PII' \
-    'pBusinessService=CheckIn' \
-    'pConfigureDirectConnect=false' \
-    'pPublSubAz1=100.65.65.0/28' \
-    'pPrivSubAz1=100.65.65.16/28' \
-    'pDataSubAz1=100.65.65.32/28' \
-    'pMgmtSubAz1=100.65.65.48/28' \
-    'pPublSubAz2=100.65.65.64/28' \
-    'pPrivSubAz2=100.65.65.80/28' \
-    'pDataSubAz2=100.65.65.96/28' \
-    'pMgmtSubAz2=100.65.65.128/28' \
-    'pPublSubAz3=100.65.65.144/28' \
-    'pPrivSubAz3=100.65.65.160/28' \
-    'pDataSubAz3=100.65.65.176/28' \
-    'pMgmtSubAz3=100.65.65.192/28' \
+    'VpcCidrBlock=100.65.65.0/24' \
+    'AppName=my-app' \
+    'EnvName=dev' \
+    'SWACostCenter=12345' \
+    'SWAPID=IT-00000' \
+    'SWAConfidentiality=SWA Confidential' \
+    'SWACompliance=PII' \
+    'SWABusinessService=CheckIn' \
+    'ConfigureDirectConnect=false' \
+    'PublSubAz1=100.65.65.0/28' \
+    'PrivSubAz1=100.65.65.16/28' \
+    'DataSubAz1=100.65.65.32/28' \
+    'MgmtSubAz1=100.65.65.48/28' \
+    'PublSubAz2=100.65.65.64/28' \
+    'PrivSubAz2=100.65.65.80/28' \
+    'DataSubAz2=100.65.65.96/28' \
+    'MgmtSubAz2=100.65.65.128/28' \
+    'PublSubAz3=100.65.65.144/28' \
+    'PrivSubAz3=100.65.65.160/28' \
+    'DataSubAz3=100.65.65.176/28' \
+    'MgmtSubAz3=100.65.65.192/28' \
   --tags \
     'SWA:Name=my-stack-name' \
     'SWA:CostCenter=12345' \
@@ -99,29 +98,29 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 
 | Parameter | Description | Format | Required | Default value |
 |-----------|-------------|--------|----------|---------------|
-| pVpcCidrBlock | VPC CIDR Block | Valid CIDR x.x.x.x/x | **true** | N/A |
-| pAppName | Name of the Application | String with no white space e.g. my-app | **true** | N/A |
-| pEnvName | Environment Name | **lab**, **dev**, **qa** or **prod** | **true** | N/A |
-| pCostCenter | Cost Center Number (5 digits) | XXXXXX | **true** | N/A |
-| pPID | SWA PID | IT-XXXXX... or IO-XXXXX... (minimum 5 digits) | **true** | N/A |
-| pConfidentiality | Confidentiality of application data | SWA Public, SWA Internal or SWA Confidential | **true** | N/A |
-| pCompliance | Compliance required for application | PCI, PII or NA | **true** | N/A |
-| pBusinessService | Business service of application | Booking, CheckIn, Manage irregular operations, etc... | **true** | N/A |
-| pPublSubAz1 | Public Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x.<br>If no value passed, subnet will not be created. | false | Empty String |
-| pPublSubAz2 | Public Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pPublSubAz3 | Public Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pPrivSubAz1 | Private Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pPrivSubAz2 | Private Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pPrivSubAz3 | Private Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pDataSubAz1 | Data Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pDataSubAz2 | Data Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pDataSubAz3 | Data Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pMgmtSubAz1 | Management Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pMgmtSubAz2 | Management Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pMgmtSubAz3 | Management Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| pConfigureDirectConnect | Configure resources to use Direct Connect | **true** or **false**<br><br>If lab environment, DX will never be created | false | false |
-| pCsrPreferredPath | The preferred network path between VPC and SWA | **CSR1** or **CSR2** | false | CSR1 |
-| pInitiateSpoke | Create connection to direct connect | **true** or **false** | false | true |
+| VpcCidrBlock | VPC CIDR Block | Valid CIDR x.x.x.x/x | **true** | N/A |
+| AppName | Name of the Application | String with no white space e.g. my-app | **true** | N/A |
+| EnvName | Environment Name | **lab**, **dev**, **qa** or **prod** | **true** | N/A |
+| SWACostCenter | Cost Center Number (5 digits) | XXXXXX | **true** | N/A |
+| SWAPID | SWA PID | IT-XXXXX... or IO-XXXXX... (minimum 5 digits) | **true** | N/A |
+| SWAConfidentiality | Confidentiality of application data | SWA Public, SWA Internal or SWA Confidential | **true** | N/A |
+| SWACompliance | Compliance required for application | PCI, PII or NA | **true** | N/A |
+| SWABusinessService | Business service of application | Booking, CheckIn, Manage irregular operations, etc... | **true** | N/A |
+| PublSubAz1 | Public Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x.<br>If no value passed, subnet will not be created. | false | Empty String |
+| PublSubAz2 | Public Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| PublSubAz3 | Public Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| PrivSubAz1 | Private Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| PrivSubAz2 | Private Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| PrivSubAz3 | Private Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| DataSubAz1 | Data Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| DataSubAz2 | Data Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| DataSubAz3 | Data Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| MgmtSubAz1 | Management Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| MgmtSubAz2 | Management Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| MgmtSubAz3 | Management Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
+| ConfigureDirectConnect | Configure resources to use Direct Connect | **true** or **false**<br><br>If lab environment, DX will never be created | false | false |
+| CsrPreferredPath | The preferred network path between VPC and SWA | **CSR1** or **CSR2** | false | CSR1 |
+| InitiateSpoke | Create connection to direct connect | **true** or **false** | false | true |
 
 ### VPC Outputs
 
