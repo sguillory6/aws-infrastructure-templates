@@ -21,7 +21,7 @@ Parameters:
   AppName:
     Type: String
     Description: 'The Name of the Application'
-  Route53Zone:
+  HostedZoneName:
     Type: String
     Description: Enter the name of the Route 53 private hosted zone.
   OnPremDomain:
@@ -126,7 +126,7 @@ Resources:
   rVpcDhcpOptions:
     Type: "AWS::EC2::DHCPOptions"
     Properties:
-      DomainName: !Ref Route53Zone
+      DomainName: !Ref HostedZoneName
       DomainNameServers:
         # preserve order of DNS servers - see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-ec2-dhcp-options.html#cfn-ec2-dhcpoptions-domainnameservers
         - !Sub "${DnsProxyAz1Ip}, ${DnsProxyAz2Ip}, ${DnsProxyAz3Ip}"
@@ -357,7 +357,7 @@ Resources:
                     local-zone: "17.172.in-addr.arpa." nodefault
                     local-zone: "168.192.in-addr.arpa." nodefault
                 forward-zone:
-                    name: ${Route53Zone}
+                    name: ${HostedZoneName}
                     forward-addr: @@vpc_dns@@
                 forward-zone:
                     name: ${OnPremDomain}
@@ -511,7 +511,7 @@ Resources:
                     local-zone: "17.172.in-addr.arpa." nodefault
                     local-zone: "168.192.in-addr.arpa." nodefault
                 forward-zone:
-                    name: ${Route53Zone}
+                    name: ${HostedZoneName}
                     forward-addr: @@vpc_dns@@
                 forward-zone:
                     name: ${OnPremDomain}
@@ -665,7 +665,7 @@ Resources:
                     local-zone: "17.172.in-addr.arpa." nodefault
                     local-zone: "168.192.in-addr.arpa." nodefault
                 forward-zone:
-                    name: ${Route53Zone}
+                    name: ${HostedZoneName}
                     forward-addr: @@vpc_dns@@
                 forward-zone:
                     name: ${OnPremDomain}

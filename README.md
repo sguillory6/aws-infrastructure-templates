@@ -200,8 +200,8 @@ In order to create the Private Hosted Zone these parameters will need to be pass
 
 | Parameter | Description | Format | Required | Default value |
 |-----------|-------------|--------|----------|---------------|
-| pHostedZoneName | The fully qualified domain name used to create the private hosted zone | xxx.swacorp.com | **true** | N/A |
-| pVpcId | The VPC ID to associate to the private hosted zone| vpc-xxxxxxxxxxxxxxxxx | **true** | N/A |
+| HostedZoneName | The fully qualified domain name used to create the private hosted zone | ...xxx.swacorp.com | **true** | N/A |
+| VpcId | The VPC ID to associate to the private hosted zone| vpc-xxxxxxxxxxxxxxxxx | **true** | N/A |
 
 ### Route53 Outputs
 
@@ -256,9 +256,9 @@ aws cloudformation deploy \
     'SWACompliance=PII' \
     'SWABusinessService=CheckIn' \
     'Route53Zone=myapp.swacorp.com' \
-    'SubnetIdAz1=subnet-0514fa9c1ab992e09' \
-    'SubnetIdAz2=subnet-061b64585ab084ab3' \
-    'SubnetIdAz3=subnet-03bb00cda5b7a9b3e' \
+    'SubnetIdAz1=subnet-0ec539a639eade280' \
+    'SubnetIdAz2=subnet-082973d0b5fe54a77' \
+    'SubnetIdAz3=subnet-0a7f218446a9cabfe' \
     'DnsProxyAz1Ip=100.65.65.58' \
     'DnsProxyAz2Ip=100.65.65.138' \
     'DnsProxyAz3Ip=100.65.65.202' \
@@ -285,7 +285,7 @@ aws cloudformation deploy \
 | SWAConfidentiality | Confidentiality of application data | SWA Public, SWA Internal or SWA Confidential | **true** | N/A |
 | SWACompliance | Compliance required for application | PCI, PII or NA | **true** | N/A |
 | SWABusinessService | Business service of application | Booking, CheckIn, Manage irregular operations, etc... | **true** | N/A |
-| Route53Zone | Enter the name of the Route 53 private hosted zone. | ...xxx.swacorp.com | **true** | N/A |
+| HostedZoneName | Enter the name of the Route 53 private hosted zone. | ...xxx.swacorp.com | **true** | N/A |
 | SubnetIdAz1 | Id of the subnet to launch the DNS instance in AZ 1 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
 | SubnetIdAz2 | Id of the subnet to launch the DNS instance in AZ 2 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
 | SubnetIdAz3 | Id of the subnet to launch the DNS instance in AZ 3 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |

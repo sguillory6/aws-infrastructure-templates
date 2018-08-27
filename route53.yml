@@ -2,10 +2,10 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: 'Creates a Route53 private hosted zone for the environment.'
 
 Parameters:
-  pHostedZoneName:
+  HostedZoneName:
     Type: String
     Description: 'Private Hosted Zone for Ops Suite environment.'
-  pVpcId:
+  VpcId:
     Type: String
     Description: 'ID of the primary VPC.'
 
@@ -14,21 +14,21 @@ Resources:
     Type: "AWS::Route53::HostedZone"
     Properties:
       HostedZoneConfig:
-        Comment: !Sub 'Hosted Zone for domain ${pHostedZoneName} in VPC ${pVpcId}'
-      Name: !Ref pHostedZoneName
+        Comment: !Sub 'Hosted Zone for domain ${HostedZoneName} in VPC ${VpcId}'
+      Name: !Ref HostedZoneName
       VPCs:
         -
-          VPCId: !Ref pVpcId
+          VPCId: !Ref VpcId
           VPCRegion: !Ref 'AWS::Region'
       HostedZoneTags:
         -
           Key: Name
-          Value: !Ref pHostedZoneName
+          Value: !Ref HostedZoneName
 
 Outputs:
   HostedZoneName:
     Description: The fully-qualified domain name.
-    Value: !Ref pHostedZoneName
+    Value: !Ref HostedZoneName
     Export:
       Name: !Sub '${AWS::StackName}-HostedZoneName'
   HostedZoneID:
