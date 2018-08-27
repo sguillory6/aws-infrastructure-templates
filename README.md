@@ -219,7 +219,11 @@ The `dns.yml` template can be used to create the DNS solution to support DNS bet
 
 The DNS template will generate the following resources:
 
-* DNS
+* An Elastic Network Interface (ENI) in each AZ created with static IPs to be used by the unbound servers 
+* An Auto Scaling Group (ASG) in each AZ that launches the unbound servers
+* Launch configurations in each AZ that are used by the ASGs to launch and configure the unbound servers
+* A DHCP Option Set that points to all the ENIs that is associated to the VPC
+* Security groups that allow access to the unbound servers for SSH and DNS
 
 ### Creating the DNS stack
 
@@ -229,7 +233,7 @@ You will need to replace the following parameters with valid values
 
 * `stack-name` - the name you wish to call your vpc stack
 * `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
-* `parameter-overrides` - see **Route53 Parameters** section below
+* `parameter-overrides` - see **DNS Parameters** section below
 * `tags`
   * `SWA:Name` - Use the same value as the `stack-name`
   * `SWA:CostCenter` - The cost center for this application (5 digits)
