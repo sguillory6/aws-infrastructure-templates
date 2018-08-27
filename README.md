@@ -89,8 +89,12 @@ aws cloudformation deploy \
 #### Template parameters
 In order to create a VPC that has associated resources such as subnets, additional parameters will need to be passed to the template.
 
-**NOTE: If you plan on connecting this VPC to Direct Connect, you must make sure you have been given a valid CIDR block
-to be used by the VPC. If you use a CIDR block that is already being used within SWA or AWS, you WILL create network outages.**
+**NOTE: 
+ If you plan on connecting this VPC to Direct Connect, you must make sure you have been given a valid CIDR block to be used by the VPC. 
+ If you use a CIDR block that is already being used within SWA or AWS, you WILL create network outages.
+ If you have configured DirectConnect for your VPC, ensure that you have changed the tag (transitVPC spoke) on the VPG from true to false before deleting the CloudFormation stack. 
+ Otherwise, the delete stack will fail.
+**
 
 | Parameter | Description | Format | Required | Default value |
 |-----------|-------------|--------|----------|---------------|
