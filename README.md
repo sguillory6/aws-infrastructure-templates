@@ -182,8 +182,8 @@ aws cloudformation deploy \
   --s3-bucket my-bucket \
   --s3-prefix route53-template \
   --parameter-overrides \
-    'pHostedZoneName=myapp.swacorp.com' \
-    'pVpcId=vpc-04d5960409f999d49' \
+    'HostedZoneName=myapp.swacorp.com' \
+    'VpcId=vpc-04d5960409f999d49' \
   --tags \
     'SWA:Name=my-stack-name' \
     'SWA:CostCenter=12345' \
@@ -259,7 +259,7 @@ aws cloudformation deploy \
     'SWAConfidentiality=SWA Confidential' \
     'SWACompliance=PII' \
     'SWABusinessService=CheckIn' \
-    'Route53Zone=myapp.swacorp.com' \
+    'HostedZoneName=myapp.swacorp.com' \
     'SubnetIdAz1=subnet-0ec539a639eade280' \
     'SubnetIdAz2=subnet-082973d0b5fe54a77' \
     'SubnetIdAz3=subnet-0a7f218446a9cabfe' \
