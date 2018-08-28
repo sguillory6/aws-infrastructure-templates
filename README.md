@@ -126,8 +126,8 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 After the VPC stack has been generated, you will have the following outputs available for use in other cloudformation templates.
 `vpc-stack-name` indicates that the export key will start with the name that was given to vpc stack.
 
-|Output Key | Export Key | Description|
-|-----------|------------|------------|
+| Output Key | Export Key | Description |
+|------------|------------|-------------|
 | VpcId | *\<vpc-stack-name>*-VpcId | The VPC ID of this VPC |
 | VpcCidrBlock | *\<vpc-stack-name>*-VpcCidrBlock | VPC CIDR Block |
 | PublicSubnet1Id | *\<vpc-stack-name>*-PubSub1Id | The ID of Public Subnet AZ 1 |
@@ -200,8 +200,8 @@ In order to create the Private Hosted Zone these parameters will need to be pass
 After the Route53 stack has been generated, you will have the following outputs available for use in other cloudformation templates.
 `route53-stack-name` indicates that the export key will start with the name that was given to route53 stack.
 
-|Output Key | Export Key | Description|
-|-----------|------------|------------|
+| Output Key | Export Key | Description |
+|------------|------------|-------------|
 | HostedZoneName | *\<route53-stack-name>*-HostedZoneName | The fully-qualified domain name |
 | HostedZoneID | *\<route53-stack-name>*-HostedZoneID | The ID of the Hosted Zone |
 
@@ -255,9 +255,9 @@ aws cloudformation deploy \
     'SubnetIdAz1=subnet-0ec539a639eade280' \
     'SubnetIdAz2=subnet-082973d0b5fe54a77' \
     'SubnetIdAz3=subnet-0a7f218446a9cabfe' \
-    'DnsProxyAz1Ip=100.65.65.58' \
-    'DnsProxyAz2Ip=100.65.65.138' \
-    'DnsProxyAz3Ip=100.65.65.202' \
+    'DnsProxyIpAz1=100.65.65.58' \
+    'DnsProxyIpAz2=100.65.65.138' \
+    'DnsProxyIpAz3=100.65.65.202' \
     'Ec2KeyPairName=shane-test'
   --tags \
     'SWA:Name=my-stack-name' \
@@ -285,12 +285,23 @@ aws cloudformation deploy \
 | SubnetIdAz1 | Id of the subnet to launch the DNS instance in AZ 1 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
 | SubnetIdAz2 | Id of the subnet to launch the DNS instance in AZ 2 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
 | SubnetIdAz3 | Id of the subnet to launch the DNS instance in AZ 3 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
-| DnsProxyAz1Ip | Enter a static IP from the AZ 1 subnet to use when launching the DNS instance<br>This must be a valid IP from the `SubnetIdAz1` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
-| DnsProxyAz2Ip | Enter a static IP from the AZ 2 subnet to use when launching the DNS instance<br>This must be a valid IP from the `SubnetIdAz2` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
-| DnsProxyAz3Ip | Enter a static IP from the AZ 3 subnet to use when launching the DNS instance<br>This must be a valid IP from the `SubnetIdAz3` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
+| DnsProxyIpAz1 | Enter a static IP from the AZ 1 subnet to use when launching the DNS proxy instance<br>This must be a valid IP from the `SubnetIdAz1` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
+| DnsProxyIpAz2 | Enter a static IP from the AZ 2 subnet to use when launching the DNS proxy instance<br>This must be a valid IP from the `SubnetIdAz2` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
+| DnsProxyIpAz3 | Enter a static IP from the AZ 3 subnet to use when launching the DNS proxy instance<br>This must be a valid IP from the `SubnetIdAz3` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
 | Ec2KeyPairName | Enter the key-pair name by which you will access the instances created. | Valid EC2 key-pair name | **true** | N/A |
 | InstanceType | Instance class used for DNS servers | t2.micro<br>t2.small<br>t2.medium<br>t2.large<br>t2.xlarge<br>m4.large<br>m4.xlarge | false | t2.micro |
 | DnsInstanceVolumeSize | Enter the disk volume size (in GB) for the DNS proxy instances. | Natural number | false | 10 |
 | OnPremDomain | Enter the name of the on-premises domain. SWA internal domain. | swacorp.com | false | swacorp.com |
 | OnPremDns1 | Enter the IP address of a primary on-premises DNS resolver (name server). | xxx.xxx.xxx.xxx | false | 172.31.10.11 |
 | OnPremDns2 | Enter the IP address of a secondary on-premises DNS resolver (name server). | xxx.xxx.xxx.xxx | false | 172.31.10.10 |
+
+### DNS Outputs
+
+After the DNS stack has been generated, you will have the following outputs available for use in other cloudformation templates.
+`dns-stack-name` indicates that the export key will start with the name that was given to DNS stack.
+
+| Output Key | Export Key | Description |
+|------------|------------|-------------|
+| DnsProxyIpAz1 | *\<dns-stack-name>*-DnsProxyIpAz1 | The static IP of the DNS proxy located in AZ 1 |
+| DnsProxyIpAz2 | *\<dns-stack-name>*-DnsProxyIpAz2 | The static IP of the DNS proxy located in AZ 2 |
+| DnsProxyIpAz3 | *\<dns-stack-name>*-DnsProxyIpAz3 | The static IP of the DNS proxy located in AZ 3 |
