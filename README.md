@@ -89,6 +89,12 @@ aws cloudformation deploy \
 
 In order to create a VPC that has associated resources such as subnets, additional parameters will need to be passed to the template.
 
+At a minimum, the private subnets in availability zones 1, 2, and 3 are required to launch a VPC. The public and data subnets are not required so if a CIDR block
+is not passed as a parameter for those subnets, they will not be created.
+
+In order for instances in the private subnets to be able to communicate to the internet (for example to install/update applications on the operating system),
+a public subnet must exists for each private subnet in each AZ.
+
 **NOTE: If you plan on connecting this VPC to Direct Connect, you must make sure you have been given a valid CIDR block
 to be used by the VPC. If you use a CIDR block that is already being used within SWA or AWS, you WILL create network outages.**
 
@@ -102,12 +108,12 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 | SWAConfidentiality | Confidentiality of application data | SWA Public, SWA Internal or SWA Confidential | **true** | N/A |
 | SWACompliance | Compliance required for application | PCI, PII or NA | **true** | N/A |
 | SWABusinessService | Business service of application | Booking, CheckIn, Manage irregular operations, etc... | **true** | N/A |
+| PrivSubAz1 | Private Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x | **true** | N/A |
+| PrivSubAz2 | Private Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x | **true** | N/A |
+| PrivSubAz3 | Private Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x | **true** | N/A |
 | PublSubAz1 | Public Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x.<br>If no value passed, subnet will not be created. | false | Empty String |
 | PublSubAz2 | Public Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | PublSubAz3 | Public Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| PrivSubAz1 | Private Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| PrivSubAz2 | Private Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| PrivSubAz3 | Private Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz1 | Data Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz2 | Data Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz3 | Data Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |

@@ -10,23 +10,14 @@ Conditions:
   cCreatePublSub1: !Not [!Equals [!Ref PublSubAz1, '']]
   cCreatePublSub2: !Not [!Equals [!Ref PublSubAz2, '']]
   cCreatePublSub3: !Not [!Equals [!Ref PublSubAz3, '']]
-  cCreatePrivSub1: !Not [!Equals [!Ref PrivSubAz1, '']]
-  cCreatePrivSub2: !Not [!Equals [!Ref PrivSubAz2, '']]
-  cCreatePrivSub3: !Not [!Equals [!Ref PrivSubAz3, '']]
-  cCreateDataSub1: !Not [!Equals [!Ref DataSubAz1, '']]
-  cCreateDataSub2: !Not [!Equals [!Ref DataSubAz2, '']]
-  cCreateDataSub3: !Not [!Equals [!Ref DataSubAz3, '']]
-
   cCreatePublResources: !Or
     - !Condition cCreatePublSub1
     - !Condition cCreatePublSub2
     - !Condition cCreatePublSub3
 
-  cCreatePrivResources: !Or
-    - !Condition cCreatePrivSub1
-    - !Condition cCreatePrivSub2
-    - !Condition cCreatePrivSub3
-
+  cCreateDataSub1: !Not [!Equals [!Ref DataSubAz1, '']]
+  cCreateDataSub2: !Not [!Equals [!Ref DataSubAz2, '']]
+  cCreateDataSub3: !Not [!Equals [!Ref DataSubAz3, '']]
   cCreateDataResources: !Or
     - !Condition cCreateDataSub1
     - !Condition cCreateDataSub2
@@ -42,104 +33,57 @@ Conditions:
     - !Condition cCreateVGW
     - !Condition cCreatePublResources
 
-  cVGWforPrivSub1: !And
-    - !Condition cCreateVGW
-    - !Condition cCreatePrivSub1
-
-  cVGWforPrivSub2: !And
-    - !Condition cCreateVGW
-    - !Condition cCreatePrivSub2
-
-  cVGWforPrivSub3: !And
-    - !Condition cCreateVGW
-    - !Condition cCreatePrivSub3
-
   cVGWforData: !And
     - !Condition cCreateVGW
     - !Condition cCreateDataResources
-
-  cCreateNatGWforAz1: !And
-    - !Condition cCreatePublSub1
-    - !Condition cCreatePrivSub1
-
-  cCreateNatGWforAz2: !And
-    - !Condition cCreatePublSub2
-    - !Condition cCreatePrivSub2
-
-  cCreateNatGWforAz3: !And
-    - !Condition cCreatePublSub3
-    - !Condition cCreatePrivSub3
 
 
 Parameters:
   VpcCidrBlock:
     Type: String
     Description: VPC CIDR Block
-    MinLength: 9
-    MaxLength: 18
     AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  PrivSubAz1:
+    Type: String
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
+    Description: 'Private Subnet Cidr for AZ1'
+  PrivSubAz2:
+    Type: String
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
+    Description: 'Private Subnet Cidr for AZ2'
+  PrivSubAz3:
+    Type: String
+    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
+    Description: 'Private Subnet Cidr for AZ3'
   PublSubAz1:
     Type: String
     Default: ''
-    MinLength: 0
-    MaxLength: 18
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Public Subnet Cidr for AZ1'
   PublSubAz2:
     Type: String
     Default: ''
-    MinLength: 0
-    MaxLength: 18
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Public Subnet Cidr for AZ2'
   PublSubAz3:
     Type: String
     Default: ''
-    MinLength: 0
-    MaxLength: 18
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Public Subnet Cidr for AZ3'
-  PrivSubAz1:
-    Type: String
-    Default: ''
-    MinLength: 0
-    MaxLength: 18
-    AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
-    Description: 'Private Subnet Cidr for AZ1'
-  PrivSubAz2:
-    Type: String
-    Default: ''
-    MinLength: 0
-    MaxLength: 18
-    AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
-    Description: 'Private Subnet Cidr for AZ2'
-  PrivSubAz3:
-    Type: String
-    Default: ''
-    MinLength: 0
-    MaxLength: 18
-    AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
-    Description: 'Private  Subnet Cidr for AZ3'
   DataSubAz1:
     Type: String
     Default: ''
-    MinLength: 0
-    MaxLength: 18
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Data Subnet Cidr for AZ1'
   DataSubAz2:
     Type: String
     Default: ''
-    MinLength: 0
-    MaxLength: 18
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Data Subnet Cidr for AZ2'
   DataSubAz3:
     Type: String
     Default: ''
-    MinLength: 0
-    MaxLength: 18
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Data Subnet Cidr for AZ3'
   ConfigureDirectConnect:
@@ -274,7 +218,7 @@ Resources:
 
 # Create the NAT Gateways for Private subnets in AZ1, AZ2 and/or AZ3 if needed
   rNatGatewayAz1:
-    Condition: cCreateNatGWforAz1
+    Condition: cCreatePublSub1
     DependsOn: rVpcGatewayAttachment
     Type: AWS::EC2::NatGateway
     Properties:
@@ -301,12 +245,12 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rNatGatewayEipAz1:
-    Condition: cCreateNatGWforAz1
+    Condition: cCreatePublSub1
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
   rNatGatewayAz2:
-    Condition: cCreateNatGWforAz2
+    Condition: cCreatePublSub2
     DependsOn: rVpcGatewayAttachment
     Type: AWS::EC2::NatGateway
     Properties:
@@ -333,12 +277,12 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rNatGatewayEipAz2:
-    Condition: cCreateNatGWforAz2
+    Condition: cCreatePublSub2
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
   rNatGatewayAz3:
-    Condition: cCreateNatGWforAz3
+    Condition: cCreatePublSub3
     DependsOn: rVpcGatewayAttachment
     Type: AWS::EC2::NatGateway
     Properties:
@@ -365,7 +309,7 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rNatGatewayEipAz3:
-    Condition: cCreateNatGWforAz3
+    Condition: cCreatePublSub3
     Type: AWS::EC2::EIP
     Properties:
       Domain: vpc
@@ -518,7 +462,6 @@ Resources:
 
 # Create Private subnets and routes or AZ1, AZ2 and/or AZ3 if requested
   rPrivSubAz1:
-    Condition: cCreatePrivSub1
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
@@ -543,7 +486,6 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivSubAz2:
-    Condition: cCreatePrivSub2
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
@@ -568,7 +510,6 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivSubAz3:
-    Condition: cCreatePrivSub3
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['2', !GetAZs '']
@@ -593,7 +534,6 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivSubRtAz1:
-    Condition: cCreatePrivSub1
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref rMainVPC
@@ -615,7 +555,6 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivSubRtAz2:
-    Condition: cCreatePrivSub2
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref rMainVPC
@@ -637,7 +576,6 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivSubRtAz3:
-    Condition: cCreatePrivSub3
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref rMainVPC
@@ -659,19 +597,16 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivateSubnet1RouteTableAssociation:
-    Condition: cCreatePrivSub1
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref rPrivSubRtAz1
       SubnetId: !Ref rPrivSubAz1
   rPrivateSubnet2RouteTableAssociation:
-    Condition: cCreatePrivSub2
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref rPrivSubRtAz2
       SubnetId: !Ref rPrivSubAz2
   rPrivateSubnet3RouteTableAssociation:
-    Condition: cCreatePrivSub3
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref rPrivSubRtAz3
@@ -831,21 +766,18 @@ Resources:
 
 # Create the Private tier default routes (0.0.0.0/0) from each AZ back to NAT gateways
   rPrivateTierDefaultRouteAZ1:
-    Condition: cCreatePrivSub1
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref rPrivSubRtAz1
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref rNatGatewayAz1
   rPrivateTierDefaultRouteAZ2:
-    Condition: cCreatePrivSub2
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref rPrivSubRtAz2
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref rNatGatewayAz2
   rPrivateTierDefaultRouteAZ3:
-    Condition: cCreatePrivSub3
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref rPrivSubRtAz3
@@ -854,7 +786,7 @@ Resources:
 
 # Create the Private tier routes (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) from each AZ back to direct connect
   rPrivateTierInternalAgg1RouteAZ1:
-    Condition: cVGWforPrivSub1
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -862,7 +794,7 @@ Resources:
       DestinationCidrBlock: 10.0.0.0/8
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg2RouteAZ1:
-    Condition: cVGWforPrivSub1
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -870,7 +802,7 @@ Resources:
       DestinationCidrBlock: 172.16.0.0/12
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg3RouteAZ1:
-    Condition: cVGWforPrivSub1
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -878,7 +810,7 @@ Resources:
       DestinationCidrBlock: 192.168.0.0/16
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg1RouteAZ2:
-    Condition: cVGWforPrivSub2
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -886,7 +818,7 @@ Resources:
       DestinationCidrBlock: 10.0.0.0/8
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg2RouteAZ2:
-    Condition: cVGWforPrivSub2
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -894,7 +826,7 @@ Resources:
       DestinationCidrBlock: 172.16.0.0/12
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg3RouteAZ2:
-    Condition: cVGWforPrivSub2
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -902,7 +834,7 @@ Resources:
       DestinationCidrBlock: 192.168.0.0/16
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg1RouteAZ3:
-    Condition: cVGWforPrivSub3
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -910,7 +842,7 @@ Resources:
       DestinationCidrBlock: 10.0.0.0/8
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg2RouteAZ3:
-    Condition: cVGWforPrivSub3
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -918,7 +850,7 @@ Resources:
       DestinationCidrBlock: 172.16.0.0/12
       GatewayId: !Ref rVirtualPrivateGateway
   rPrivateTierInternalAgg3RouteAZ3:
-    Condition: cVGWforPrivSub3
+    Condition: cCreateVGW
     Type: AWS::EC2::Route
     DependsOn: rVirtualPrivateGatewayAttachment
     Properties:
@@ -1021,7 +953,6 @@ Resources:
 
 # Create NACLs for Private subnets
   rPrivateTierSubnetsNacl:
-    Condition: cCreatePrivResources
     Type: AWS::EC2::NetworkAcl
     Properties:
       VpcId: !Ref rMainVPC
@@ -1043,7 +974,6 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivateTierSubnetsNaclIn:
-    Condition: cCreatePrivResources
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
@@ -1056,7 +986,6 @@ Resources:
         From: '-1'
         To: '-1'
   rPrivateTierSubnetsNaclOut:
-    Condition: cCreatePrivResources
     Type: AWS::EC2::NetworkAclEntry
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
@@ -1069,19 +998,16 @@ Resources:
         From: '-1'
         To: '-1'
   rNaclAssocPrivSubnet1:
-    Condition: cCreatePrivSub1
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
       SubnetId: !Ref rPrivSubAz1
   rNaclAssocPrivSubnet2:
-    Condition: cCreatePrivSub2
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
       SubnetId: !Ref rPrivSubAz2
   rNaclAssocPrivSubnet3:
-    Condition: cCreatePrivSub3
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
@@ -1192,37 +1118,31 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-PubRTId'
   PrivateSubnet1Id:
-    Condition: cCreatePrivSub1
     Description: 'Private Subnet 1 ID'
     Value: !Ref rPrivSubAz1
     Export:
       Name: !Sub '${AWS::StackName}-PrivSub1Id'
   PrivateSubnet2Id:
-    Condition: cCreatePrivSub2
     Description: 'Private Subnet 2 ID'
     Value: !Ref rPrivSubAz2
     Export:
       Name: !Sub '${AWS::StackName}-PrivSub2Id'
   PrivateSubnet3Id:
-    Condition: cCreatePrivSub3
     Description: 'Private Subnet 3 ID'
     Value: !Ref rPrivSubAz3
     Export:
       Name: !Sub '${AWS::StackName}-PrivSub3Id'
   PrivateSubnetRouteTableAZ1:
-    Condition: cCreatePrivSub1
     Description: 'Private Subnet Route Table ID of AZ 1'
     Value: !Ref rPrivSubRtAz1
     Export:
       Name: !Sub '${AWS::StackName}-PrivRT1Id'
   PrivateSubnetRouteTableAZ2:
-    Condition: cCreatePrivSub2
     Description: 'Private Subnet Route Table ID of AZ 2'
     Value: !Ref rPrivSubRtAz2
     Export:
       Name: !Sub '${AWS::StackName}-PrivRT2Id'
   PrivateSubnetRouteTableAZ3:
-    Condition: cCreatePrivSub3
     Description: 'Private Subnet Route Table ID of AZ 3'
     Value: !Ref rPrivSubRtAz3
     Export:
