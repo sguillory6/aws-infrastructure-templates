@@ -20,15 +20,14 @@ The VPC template will generate the following resources:
 
 * VPC
 * Public subnets in up to 3 AZs (availability zones) - Used for access to services from public internet and host the NAT Gateway
-  for servers in public and management subnets to access internet.
+  for servers in private subnets to access internet.
 * Private subnets in up to 3 AZs - Used for services that will only be accessed from SWA or public subnets.
 * Data subnets in up to 3 AZs - Used for running data services such as RDS or Gemfire. Should only be accessible from private subnets.
-* Management Subnets in up to 3 AZs - Used for management of other subnets such as bastion hosts and DNS services.
 * Route tables and default entries for each subnet created
 * NACLs
 * Default SSH security group
 * Internet Gateway (IGW) if any public subnet is created
-* NAT Gateways for each AZ that contains a private and/or management subnet if the public subnet exists (Internet gateway required for NAT)
+* NAT Gateways for each AZ that contains a private subnet if the public subnet exists (Internet gateway required for NAT)
 * Elastic IPs - one for each NAT Gateway in each of the 3 AZs
 * VPN Gateway (VPG) to connect to Direct Connect if requested
 
@@ -70,15 +69,12 @@ aws cloudformation deploy \
     'PublSubAz1=100.65.65.0/28' \
     'PrivSubAz1=100.65.65.16/28' \
     'DataSubAz1=100.65.65.32/28' \
-    'MgmtSubAz1=100.65.65.48/28' \
     'PublSubAz2=100.65.65.64/28' \
     'PrivSubAz2=100.65.65.80/28' \
     'DataSubAz2=100.65.65.96/28' \
-    'MgmtSubAz2=100.65.65.128/28' \
     'PublSubAz3=100.65.65.144/28' \
     'PrivSubAz3=100.65.65.160/28' \
     'DataSubAz3=100.65.65.176/28' \
-    'MgmtSubAz3=100.65.65.192/28' \
   --tags \
     'SWA:Name=my-stack-name' \
     'SWA:CostCenter=12345' \
@@ -115,9 +111,6 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 | DataSubAz1 | Data Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz2 | Data Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz3 | Data Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| MgmtSubAz1 | Management Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| MgmtSubAz2 | Management Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| MgmtSubAz3 | Management Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | ConfigureDirectConnect | Configure resources to use Direct Connect | **true** or **false**<br><br>If lab environment, DX will never be created | false | false |
 | CsrPreferredPath | The preferred network path between VPC and SWA | **CSR1** or **CSR2** | false | CSR1 |
 | InitiateSpoke | Create connection to direct connect | **true** or **false** | false | true |
@@ -141,12 +134,6 @@ After the VPC stack has been generated, you will have the following outputs avai
 | PrivateSubnetRouteTableAZ1 | *\<vpc-stack-name>*-PrivRT1Id | Private Subnet Route Table ID of AZ 1 |
 | PrivateSubnetRouteTableAZ2 | *\<vpc-stack-name>*-PrivRT2Id | Private Subnet Route Table ID of AZ 2 |
 | PrivateSubnetRouteTableAZ3 | *\<vpc-stack-name>*-PrivRT3Id | Private Subnet Route Table ID of AZ 3 |
-| ManagementSubnet1Id | *\<vpc-stack-name>*-MgmtSub1Id | Management Subnet 1 ID |
-| ManagementSubnet2Id | *\<vpc-stack-name>*-MgmtSub2Id | Management Subnet 2 ID |
-| ManagementSubnet3Id | *\<vpc-stack-name>*-MgmtSub3Id | Management Subnet 3 ID |
-| ManagementSubnetRouteTableAZ1 | *\<vpc-stack-name>*-MgmtRT1Id | Management Subnet Route Table ID of AZ 1 |
-| ManagementSubnetRouteTableAZ2 | *\<vpc-stack-name>*-MgmtRT2Id | Management Subnet Route Table ID of AZ 2 |
-| ManagementSubnetRouteTableAZ3 | *\<vpc-stack-name>*-MgmtRT3Id | Management Subnet Route Table ID of AZ 3  |
 | DataSubnet1Id | *\<vpc-stack-name>*-DataSub1Id | Data Subnet 1 ID |
 | DataSubnet2Id | *\<vpc-stack-name>*-DataSub2Id | Data Subnet 2 ID |
 | DataSubnet3Id | *\<vpc-stack-name>*-DataSub3Id | Data Subnet 3 ID |
