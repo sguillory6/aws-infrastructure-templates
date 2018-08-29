@@ -320,8 +320,8 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.rLaunchConfigDnsProxy.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource rLaunchConfigDnsProxy --configsets InstallAndRun --region ${AWS::Region}
+                path=Resources.rLaunchConfigDnsProxyAz1.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource rLaunchConfigDnsProxyAz1 --configsets InstallAndRun --region ${AWS::Region}
                 runas=root
           services:
             sysvinit:
@@ -474,8 +474,8 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.rLaunchConfigDnsProxy.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource rLaunchConfigDnsProxy --configsets InstallAndRun --region ${AWS::Region}
+                path=Resources.rLaunchConfigDnsProxyAz2.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource rLaunchConfigDnsProxyAz2 --configsets InstallAndRun --region ${AWS::Region}
                 runas=root
           services:
             sysvinit:
@@ -628,8 +628,8 @@ Resources:
               content: !Sub |
                 [cfn-auto-reloader-hook]
                 triggers=post.update
-                path=Resources.rLaunchConfigDnsProxy.Metadata.AWS::CloudFormation::Init
-                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource rLaunchConfigDnsProxy --configsets InstallAndRun --region ${AWS::Region}
+                path=Resources.rLaunchConfigDnsProxyAz3.Metadata.AWS::CloudFormation::Init
+                action=/opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource rLaunchConfigDnsProxyAz3 --configsets InstallAndRun --region ${AWS::Region}
                 runas=root
           services:
             sysvinit:
