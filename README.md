@@ -145,6 +145,13 @@ After the VPC stack has been generated, you will have the following outputs avai
 | DataSubnet3Id | *\<vpc-stack-name>*-DataSub3Id | Data Subnet 3 ID |
 | DataSubnetRouteTableAZ | *\<vpc-stack-name>*-DataRtId | Data Subnet Route Table ID |
 
+### Deleting VPC Stack
+
+When deleting the VPC stack, if you have Direct Connect enabled, you will need to disconnect existing VPN
+connections before AWS will allow you to delete the VPC stack. To disconnect VPN connections, the spoke tag on the VGW will need to be set to false and you will need to wait for connections to be disabled/disconnected before attempting to delete the stack.
+
+You will also need to delete any resource that were created in the VPC prior to deleting the VPC stack.
+
 ## Route53
 
 The `route53.yml` template can be used to create a Route53 Private Hosted Zone associated to a specific VPC.
@@ -204,6 +211,11 @@ After the Route53 stack has been generated, you will have the following outputs 
 |------------|------------|-------------|
 | HostedZoneName | *\<route53-stack-name>*-HostedZoneName | The fully-qualified domain name |
 | HostedZoneID | *\<route53-stack-name>*-HostedZoneID | The ID of the Hosted Zone |
+
+### Deleting Route53 Stack
+
+When deleting the Route53 stack, you will need to remove any additional record sets that were created in
+the private hosted zone before AWS will allow the hosted zone to be removed.
 
 ## DNS
 

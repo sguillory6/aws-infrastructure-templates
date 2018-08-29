@@ -8,6 +8,40 @@ Parameters:
   VpcId:
     Type: String
     Description: 'ID of the primary VPC.'
+  EnvName:
+    Type: String
+    Description: 'Environment Name e.g. lab, dev, qa, prod'
+  AppName:
+    Type: String
+    Description: 'The Name of the Application'
+  SWACostCenter:
+    Type: String
+    Description: 'Cost Center Number (5 digits)'
+    AllowedPattern: '(\d{5})'
+    ConstraintDescription: 'Must be in the format XXXXX (5 digits)'
+  SWAPID:
+    Type: String
+    Description: 'IT-XXXXX... or IO-XXXXX... (minimum 5 digits)'
+    AllowedPattern: '(IT-\d{5,})|(IO-\d{5,})'
+    ConstraintDescription: 'Must be in the format IT-XXXXX... or IO-XXXXX... (minimum 5 digits)'
+  SWAConfidentiality:
+    Type: String
+    Description: 'SWA Public, SWA Internal, SWA Confidential'
+    AllowedValues:
+      - SWA Public
+      - SWA Internal
+      - SWA Confidential
+  SWACompliance:
+    Type: String
+    Description: 'PCI, PII, NA'
+    AllowedValues:
+      - NA
+      - PII
+      - PCI
+  SWABusinessService:
+    Type: String
+    Description: 'Booking, CheckIn, Manage irregular operations'
+
 
 Resources:
   rDns:
@@ -17,13 +51,25 @@ Resources:
         Comment: !Sub 'Hosted Zone for domain ${HostedZoneName} in VPC ${VpcId}'
       Name: !Ref HostedZoneName
       VPCs:
-        -
-          VPCId: !Ref VpcId
+        - VPCId: !Ref VpcId
           VPCRegion: !Ref 'AWS::Region'
       HostedZoneTags:
-        -
-          Key: Name
-          Value: !Ref HostedZoneName
+        - Key: Name
+          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'private-hosted-zone']]
+        - Key: SWA:Name
+          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'private-hosted-zone']]
+        - Key: SWA:SWACostCenter
+          Value: !Ref SWACostCenter
+        - Key: SWA:PID
+          Value: !Ref SWAPID
+        - Key: SWA:Confidentiality
+          Value: !Ref SWAConfidentiality
+        - Key: SWA:Compliance
+          Value: !Ref SWACompliance
+        - Key: SWA:BusinessService
+          Value: !Ref SWABusinessService
+        - Key: SWA:Environment
+          Value: !Ref EnvName
 
 Outputs:
   HostedZoneName:
