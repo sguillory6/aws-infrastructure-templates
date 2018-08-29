@@ -33,24 +33,10 @@ The VPC template will generate the following resources:
 
 ### Creating VPC stack
 
-The following is an example of how to use the cloudformation template to generate a VPC. This call
-will create a VPC with all 4 subnet tiers in all 3 availability zones.
-
-You will need to replace the following parameters with valid values:
-
-* `stack-name` - The name you wish to call your vpc stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
-* `parameter-overrides` - see **VPC Parameters** section below
-* `tags`
-  * `SWA:Name` - Use the same value as the `stack-name`
-  * `SWA:CostCenter` - The cost center for this application (5 digits)
-  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
-  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
-  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
-  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
-  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
+The following is an example of how to use the CloudFormation template to generate a VPC:
 
 ```bash
+### This call will create a VPC with all 3 subnet tiers in all 3 availability zones.
 aws cloudformation deploy \
   --stack-name my-stack-name \
   --template-file vpc.yml \
@@ -84,6 +70,19 @@ aws cloudformation deploy \
     'SWA:BusinessService=CheckIn' \
     'SWA:Environment=dev'
 ```
+You will need to replace the following parameters with valid values:
+
+* `stack-name` - The name you wish to call your vpc stack
+* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
+* `parameter-overrides` - see **VPC Parameters** section below
+* `tags`
+  * `SWA:Name` - Use the same value as the `stack-name`
+  * `SWA:CostCenter` - The cost center for this application (5 digits)
+  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
+  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
+  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
+  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
+  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
 
 ### VPC Parameters
 
