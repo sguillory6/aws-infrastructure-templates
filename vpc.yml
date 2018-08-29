@@ -314,14 +314,13 @@ Resources:
     Properties:
       Domain: vpc
 
-# Create Public subnets and routes or AZ1, AZ2 and/or AZ3 if requested
+# Create Public subnets and routes for AZ1, AZ2 and/or AZ3 if requested
   rPublicSubAz1:
     Condition: cCreatePublicSub1
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       CidrBlock: !Ref PublicSubAz1
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -346,7 +345,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       CidrBlock: !Ref PublicSubAz2
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -371,7 +369,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['2', !GetAZs '']
       CidrBlock: !Ref PublicSubAz3
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -466,7 +463,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       CidrBlock: !Ref PrivateSubAz1
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -490,7 +486,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       CidrBlock: !Ref PrivateSubAz2
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -514,7 +509,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['2', !GetAZs '']
       CidrBlock: !Ref PrivateSubAz3
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -619,7 +613,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
       CidrBlock: !Ref DataSubAz1
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -644,7 +637,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
       CidrBlock: !Ref DataSubAz2
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
@@ -669,7 +661,6 @@ Resources:
     Properties:
       AvailabilityZone: !Select ['2', !GetAZs '']
       CidrBlock: !Ref DataSubAz3
-      MapPublicIpOnLaunch: false
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name

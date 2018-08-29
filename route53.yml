@@ -4,7 +4,7 @@ Description: 'Creates a Route53 private hosted zone for the environment.'
 Parameters:
   HostedZoneName:
     Type: String
-    Description: 'Private Hosted Zone for Ops Suite environment.'
+    Description: 'Private Hosted Zone associated to application for environment.'
   VpcId:
     Type: String
     Description: 'ID of the primary VPC.'
