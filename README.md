@@ -36,9 +36,9 @@ The VPC template will generate the following resources:
 The following is an example of how to use the cloudformation template to generate a VPC. This call
 will create a VPC with all 4 subnet tiers in all 3 availability zones.
 
-You will need to replace the following parameters with valid values
+You will need to replace the following parameters with valid values:
 
-* `stack-name` - the name you wish to call your vpc stack
+* `stack-name` - The name you wish to call your vpc stack
 * `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
 * `parameter-overrides` - see **VPC Parameters** section below
 * `tags`
@@ -89,11 +89,11 @@ aws cloudformation deploy \
 
 In order to create a VPC that has associated resources such as subnets, additional parameters will need to be passed to the template.
 
-At a minimum, the private subnets in availability zones 1, 2, and 3 are required to launch a VPC. The public and data subnets are not required so if a CIDR block
+At a minimum, the private subnets in availability zones 1, 2, and 3 are required to launch a VPC. The public and data subnets are not required, so if a CIDR block
 is not passed as a parameter for those subnets, they will not be created.
 
 In order for instances in the private subnets to be able to communicate to the internet (for example to install/update applications on the operating system),
-a public subnet must exists for each private subnet in each AZ.
+a public subnet must exist for each private subnet in each AZ.
 
 **NOTE: If you plan on connecting this VPC to Direct Connect, you must make sure you have been given a valid CIDR block
 to be used by the VPC. If you use a CIDR block that is already being used within SWA or AWS, you WILL create network outages.**
@@ -124,7 +124,7 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 ### VPC Outputs
 
 After the VPC stack has been generated, you will have the following outputs available for use in other cloudformation templates.
-`vpc-stack-name` indicates that the export key will start with the name that was given to vpc stack.
+`vpc-stack-name` indicates that the export key will start with the name that was given to VPC stack.
 
 | Output Key | Export Key | Description |
 |------------|------------|-------------|
@@ -147,10 +147,10 @@ After the VPC stack has been generated, you will have the following outputs avai
 
 ### Deleting VPC Stack
 
-When deleting the VPC stack, if you have Direct Connect enabled, you will need to disconnect existing VPN
-connections before AWS will allow you to delete the VPC stack. To disconnect VPN connections, the spoke tag on the VGW will need to be set to false and you will need to wait for connections to be disabled/disconnected before attempting to delete the stack.
+When deleting the VPC stack, if you have Direct Connect enabled, you will need to disconnect existing VPN connections before AWS will allow you to delete the VPC stack. 
+To disconnect VPN connections, the spoke tag on the VGW will need to be set to false and you will need to wait for connections to be disabled/disconnected before attempting to delete the stack.
 
-You will also need to delete any resource that were created in the VPC prior to deleting the VPC stack.
+You will also need to delete any resources that were created in the VPC prior to deleting the VPC stack.
 
 ## Route53
 
@@ -158,12 +158,12 @@ The `route53.yml` template can be used to create a Route53 Private Hosted Zone a
 
 ### Creating the Route53 stack
 
-The following is an example of how to use the cloudformation template to generate the Route53 Private Hosted Zone.
+The following is an example of how to use the CloudFormation template to generate the Route53 Private Hosted Zone.
 
-You will need to replace the following parameters with valid values
+You will need to replace the following parameters with valid values:
 
-* `stack-name` - the name you wish to call your vpc stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
+* `stack-name` - the name you wish to call your VPC stack
+* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
 * `parameter-overrides` - see **Route53 Parameters** section below
 * `tags`
   * `SWA:Name` - Use the same value as the `stack-name`
@@ -204,8 +204,8 @@ In order to create the Private Hosted Zone these parameters will need to be pass
 
 ### Route53 Outputs
 
-After the Route53 stack has been generated, you will have the following outputs available for use in other cloudformation templates.
-`route53-stack-name` indicates that the export key will start with the name that was given to route53 stack.
+After the Route53 stack has been generated, you will have the following outputs available for use in other CloudFormation templates.
+`route53-stack-name` indicates that the export key will start with the name that was given to the Route53 stack.
 
 | Output Key | Export Key | Description |
 |------------|------------|-------------|
@@ -214,8 +214,7 @@ After the Route53 stack has been generated, you will have the following outputs 
 
 ### Deleting Route53 Stack
 
-When deleting the Route53 stack, you will need to remove any additional record sets that were created in
-the private hosted zone before AWS will allow the hosted zone to be removed.
+When deleting the Route53 stack, you will need to remove any additional record sets that were created in the private hosted zone before AWS will allow the hosted zone to be removed.
 
 ## DNS
 
@@ -231,12 +230,12 @@ The DNS template will generate the following resources:
 
 ### Creating the DNS stack
 
-The following is an example of how to use the cloudformation template to generate the DNS solution.
+The following is an example of how to use the CloudFormation template to generate the DNS solution.
 
 You will need to replace the following parameters with valid values
 
-* `stack-name` - the name you wish to call your vpc stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
+* `stack-name` - the name you wish to call your VPC stack
+* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
 * `parameter-overrides` - see **DNS Parameters** section below
 * `tags`
   * `SWA:Name` - Use the same value as the `stack-name`
