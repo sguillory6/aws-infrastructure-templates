@@ -1,11 +1,11 @@
-# SWA Infrastructure templates
+# SWA Infrastructure Templates
 
-This repository contains the SWA sanctioned cloudformation templates that can be used to create the infrastructure resources
+This repository contains the SWA sanctioned CloudFormation templates that can be used to create the infrastructure resources
 needed to support application development in AWS accounts.
 
-## Template variable naming convention
+## Template Variable Naming Convention
 
-The variables used in the templates are named with the following convention
+The variables used in the templates are named with the following convention:
 
 * Variables that start with a `m` are mappings
 * Variables that start with a `c` are conditions
@@ -31,7 +31,7 @@ The VPC template will generate the following resources:
 * Elastic IPs - one for each NAT Gateway in each of the 3 AZs
 * VPN Gateway (VPG) to connect to Direct Connect if requested
 
-### Creating VPC stack
+### Creating VPC Stack
 
 The following is an example of how to use the CloudFormation template to generate a VPC:
 
@@ -157,7 +157,7 @@ You will also need to delete any resources that were created in the VPC prior to
 
 The `route53.yml` template can be used to create a Route53 Private Hosted Zone associated to a specific VPC.
 
-### Creating the Route53 stack
+### Creating the Route53 Stack
 
 The following is an example of how to use the CloudFormation template to generate the Route53 Private Hosted Zone.
 
@@ -229,7 +229,7 @@ The DNS template will generate the following resources:
 * A DHCP Option Set that points to all the ENIs that is associated to the VPC
 * Security groups that allow access to the unbound servers for SSH and DNS
 
-### Creating the DNS stack
+### Creating DNS stack
 
 The following is an example of how to use the CloudFormation template to generate the DNS solution.
 
