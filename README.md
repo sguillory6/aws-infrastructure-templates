@@ -36,7 +36,9 @@ The VPC template will generate the following resources:
 The following is an example of how to use the CloudFormation template to generate a VPC:
 
 ```bash
+
 ### This call will create a VPC with all 3 subnet tiers in all 3 availability zones.
+
 aws cloudformation deploy \
   --stack-name my-stack-name \
   --template-file vpc.yml \
@@ -122,7 +124,7 @@ to be used by the VPC. If you use a CIDR block that is already being used within
 
 ### VPC Outputs
 
-After the VPC stack has been generated, you will have the following outputs available for use in other cloudformation templates.
+After the VPC stack has been generated, you will have the following outputs available for use in other CloudFormation templates.
 `vpc-stack-name` indicates that the export key will start with the name that was given to VPC stack.
 
 | Output Key | Export Key | Description |
@@ -213,7 +215,7 @@ After the Route53 stack has been generated, you will have the following outputs 
 
 ### Deleting Route53 Stack
 
-When deleting the Route53 stack, you will need to remove any additional record sets that were created in the private hosted zone before AWS will allow the hosted zone to be removed.
+When deleting the Route53 stack, you will need to remove any additional RecordSets that were created in the Private Hosted Zone before AWS will allow the hosted zone to be removed.
 
 ## DNS
 
@@ -307,7 +309,7 @@ aws cloudformation deploy \
 
 ### DNS Outputs
 
-After the DNS stack has been generated, you will have the following outputs available for use in other cloudformation templates.
+After the DNS stack has been generated, you will have the following outputs available for use in other CloudFormation templates.
 `dns-stack-name` indicates that the export key will start with the name that was given to DNS stack.
 
 | Output Key | Export Key | Description |
