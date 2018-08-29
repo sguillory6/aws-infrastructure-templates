@@ -27,7 +27,7 @@ The VPC template will generate the following resources:
 * NACLs
 * Default SSH security group
 * Internet Gateway (IGW) if any public subnet is created
-* NAT Gateways for each AZ that contains a private subnet if the public subnet exists (Internet gateway required for NAT)
+* NAT Gateways for each AZ that contains a private subnet if the public subnet exists (Internet Gateway required for NAT)
 * Elastic IPs - one for each NAT Gateway in each of the 3 AZs
 * VPN Gateway (VPG) to connect to Direct Connect if requested
 
