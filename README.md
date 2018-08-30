@@ -36,11 +36,10 @@ The VPC template will generate the following resources:
 The following is an example of how to use the CloudFormation template to generate a VPC:
 
 ```bash
-
 ### This call will create a VPC with all 3 subnet tiers in all 3 availability zones.
 
 aws cloudformation deploy \
-  --stack-name my-stack-name \
+  --stack-name my-app-dev-us-east-1-vpc-stack \
   --template-file vpc.yml \
   --s3-bucket my-bucket \
   --s3-prefix vpc-template \
@@ -64,7 +63,7 @@ aws cloudformation deploy \
     'PrivateSubAz3=100.65.65.160/28' \
     'DataSubAz3=100.65.65.176/28' \
   --tags \
-    'SWA:Name=my-stack-name' \
+    'SWA:Name=my-app-dev-us-east-1-vpc-stack' \
     'SWA:CostCenter=12345' \
     'SWA:PID=IT-00000' \
     'SWA:Confidentiality=SWA Confidential' \
@@ -72,13 +71,14 @@ aws cloudformation deploy \
     'SWA:BusinessService=CheckIn' \
     'SWA:Environment=dev'
 ```
+
 You will need to replace the following parameters with valid values:
 
-* `stack-name` - The name you wish to call your vpc stack
+* `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-vpc-stack
 * `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
 * `parameter-overrides` - see **VPC Parameters** section below
 * `tags`
-  * `SWA:Name` - Use the same value as the `stack-name`
+  * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-vpc-stack
   * `SWA:CostCenter` - The cost center for this application (5 digits)
   * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
   * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
@@ -148,8 +148,8 @@ After the VPC stack has been generated, you will have the following outputs avai
 
 ### Deleting VPC Stack
 
-When deleting the VPC stack, if you have Direct Connect enabled, you will need to disconnect existing VPN connections before AWS will allow you to delete the VPC stack. 
-To disconnect VPN connections, the spoke tag on the VGW will need to be set to false and you will need to wait for connections to be disabled/disconnected before attempting to delete the stack.
+When deleting the VPC stack, if you have Direct Connect enabled, you will need to delete existing VPN connections before AWS will allow you to delete the VPC stack.
+To delete the VPN connections, the **spoke** tag on the VGW will need to be set to **false** and you will need to wait for connections to be deleted before attempting to delete the stack.
 
 You will also need to delete any resources that were created in the VPC prior to deleting the VPC stack.
 
@@ -161,23 +161,9 @@ The `route53.yml` template can be used to create a Route53 Private Hosted Zone a
 
 The following is an example of how to use the CloudFormation template to generate the Route53 Private Hosted Zone.
 
-You will need to replace the following parameters with valid values:
-
-* `stack-name` - the name you wish to call your VPC stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
-* `parameter-overrides` - see **Route53 Parameters** section below
-* `tags`
-  * `SWA:Name` - Use the same value as the `stack-name`
-  * `SWA:CostCenter` - The cost center for this application (5 digits)
-  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
-  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
-  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
-  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
-  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
-
 ```bash
 aws cloudformation deploy \
-  --stack-name my-stack-name \
+  --stack-name my-app-dev-us-east-1-route53-stack \
   --template-file route53.yml \
   --s3-bucket my-bucket \
   --s3-prefix route53-template \
@@ -185,7 +171,7 @@ aws cloudformation deploy \
     'HostedZoneName=myapp.swacorp.com' \
     'VpcId=vpc-04d5960409f999d49' \
   --tags \
-    'SWA:Name=my-stack-name' \
+    'SWA:Name=my-app-dev-us-east-1-route53-stack' \
     'SWA:CostCenter=12345' \
     'SWA:PID=IT-00000' \
     'SWA:Confidentiality=SWA Confidential' \
@@ -193,6 +179,20 @@ aws cloudformation deploy \
     'SWA:BusinessService=CheckIn' \
     'SWA:Environment=dev'
 ```
+
+You will need to replace the following parameters with valid values:
+
+* `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-route53-stack
+* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
+* `parameter-overrides` - see **Route53 Parameters** section below
+* `tags`
+  * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-route53-stack
+  * `SWA:CostCenter` - The cost center for this application (5 digits)
+  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
+  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
+  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
+  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
+  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
 
 ### Route53 Parameters
 
@@ -233,25 +233,11 @@ The DNS template will generate the following resources:
 
 The following is an example of how to use the CloudFormation template to generate the DNS solution.
 
-You will need to replace the following parameters with valid values
-
-* `stack-name` - the name you wish to call your VPC stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
-* `parameter-overrides` - see **DNS Parameters** section below
-* `tags`
-  * `SWA:Name` - Use the same value as the `stack-name`
-  * `SWA:CostCenter` - The cost center for this application (5 digits)
-  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
-  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
-  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
-  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
-  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
-
 ```bash
 aws cloudformation deploy \
-  --stack-name dns-stack-name \
+  --stack-name my-app-dev-us-east-1-dns-stack \
   --template-file dns.yml \
-  --s3-bucket swa-devops-898203315548-us-east-1 \
+  --s3-bucket my-bucket \
   --s3-prefix vpc-template \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
@@ -270,9 +256,9 @@ aws cloudformation deploy \
     'DnsProxyIpAz1=100.65.65.58' \
     'DnsProxyIpAz2=100.65.65.138' \
     'DnsProxyIpAz3=100.65.65.202' \
-    'Ec2KeyPairName=shane-test'
+    'Ec2KeyPairName=my-key-pair'
   --tags \
-    'SWA:Name=my-stack-name' \
+    'SWA:Name=my-app-dev-us-east-1-dns-stack' \
     'SWA:CostCenter=12345' \
     'SWA:PID=IT-00000' \
     'SWA:Confidentiality=SWA Confidential' \
@@ -280,6 +266,20 @@ aws cloudformation deploy \
     'SWA:BusinessService=CheckIn' \
     'SWA:Environment=dev'
 ```
+
+You will need to replace the following parameters with valid values
+
+* `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-dns-stack
+* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
+* `parameter-overrides` - see **DNS Parameters** section below
+* `tags`
+  * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-dns-stack
+  * `SWA:CostCenter` - The cost center for this application (5 digits)
+  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
+  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
+  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
+  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
+  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
 
 ### DNS Parameters
 
