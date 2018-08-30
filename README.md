@@ -167,8 +167,6 @@ The following is an example of how to use the CloudFormation template to generat
 aws cloudformation deploy \
   --stack-name my-app-dev-us-east-1-route53-stack \
   --template-file route53.yml \
-  --s3-bucket my-bucket \
-  --s3-prefix route53-template \
   --parameter-overrides \
     'HostedZoneName=myapp.swacorp.com' \
     'VpcId=vpc-04d5960409f999d49' \
@@ -185,7 +183,6 @@ aws cloudformation deploy \
 You will need to replace the following parameters with valid values:
 
 * `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-route53-stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
 * `parameter-overrides` - see **Route53 Parameters** section below
 * `tags`
   * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-route53-stack
@@ -240,7 +237,7 @@ aws cloudformation deploy \
   --stack-name my-app-dev-us-east-1-dns-stack \
   --template-file dns.yml \
   --s3-bucket my-bucket \
-  --s3-prefix vpc-template \
+  --s3-prefix dns-template \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
     'VpcId=vpc-04d5960409f999d49' \
