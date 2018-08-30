@@ -757,18 +757,21 @@ Resources:
 
 # Create the Private tier default routes (0.0.0.0/0) from each AZ back to NAT gateways
   rPrivateTierDefaultRouteAZ1:
+    Condition: cCreatePublicSub1
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref rPrivateSubRtAz1
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref rNatGatewayAz1
   rPrivateTierDefaultRouteAZ2:
+    Condition: cCreatePublicSub2
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref rPrivateSubRtAz2
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref rNatGatewayAz2
   rPrivateTierDefaultRouteAZ3:
+    Condition: cCreatePublicSub3
     Type: AWS::EC2::Route
     Properties:
       RouteTableId: !Ref rPrivateSubRtAz3
