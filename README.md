@@ -98,7 +98,7 @@ a public subnet must exist for each private subnet in each AZ.
 
 **VERY IMPORTANT**
 * **If connecting this VPC to Direct Connect, the CIDR MUST BE PROVIDED by the SWA Network Engineering team or this WILL create network outages.**
-* **Do not use the same CIDR block in multiple VPCs or this WILL create network outages.**
+* **If connecting this VPC to Direct Connect, do not use the same CIDR block in multiple VPCs or this WILL create network outages.**
 * **Do not attempt to use Direct Connect in a lab environment.**
 
 | Parameter | Description | Format | Required | Default value |
