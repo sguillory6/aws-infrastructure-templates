@@ -321,5 +321,5 @@ After the DNS stack has been generated, you will have the following outputs avai
 
 All the EC2 instances created in the VPC (after the stack is deployed correctly and the DNS servers are available and ready to serve) will have these DNS servers configured to resolve on prem and aws hosted domains.
 All EC2 instances created prior to deployment of this stack must have resolver reconfigured to use these DNS servers.
-For On Prem servers to resolve the AWS resources, you must submit a DASH request to have SWA DNS configured to forward requests to these DNS servers. Please contact EC team for additional help.
+For On Prem servers to resolve the AWS resources, you must submit a DASH request to have SWA DNS configured to forward requests to these DNS servers. Please contact Enterprise Cloud team for additional help.
 
