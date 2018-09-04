@@ -152,6 +152,12 @@ After the VPC stack has been generated, you will have the following outputs avai
 
 When deleting the VPC stack, if you have Direct Connect enabled, you will need to delete existing VPN connections before AWS will allow you to delete the VPC stack.
 To delete the VPN connections, the **spoke** tag on the VGW will need to be set to **false** and you will need to wait for connections to be deleted before attempting to delete the stack.
+```
+# Changing the flag using CLI when you've just the one VPN Gateway
+env=`aws ec2 describe-tags --filters "Name=resource-id,Values=$ID" "Name=key,Values=SWA:Environment" | jq -r .Tags[].Value`
+resource_id=`aws ec2 describe-vpn-gateways |jq -r .VpnGateways[].VpnGatewayId` # Add filter to just get the one you care
+aws ec2 create-tags --resources ${resource_id}  --tags "Key=${ENV}-transitVPC:${AWS_DEFAULT_REGION}:spoke,Value=false"
+```
 
 You will also need to delete any resources that were created in the VPC prior to deleting the VPC stack.
 
