@@ -15,6 +15,14 @@ Conditions:
     - !Condition cCreatePublicSub2
     - !Condition cCreatePublicSub3
 
+  cCreatePrivateSub1: !Not [!Equals [!Ref PrivateSubAz1, '']]
+  cCreatePrivateSub2: !Not [!Equals [!Ref PrivateSubAz2, '']]
+  cCreatePrivateSub3: !Not [!Equals [!Ref PrivateSubAz3, '']]
+  cCreatePrivateResources: !Or
+    - !Condition cCreatePrivateSub1
+    - !Condition cCreatePrivateSub2
+    - !Condition cCreatePrivateSub3
+
   cCreateDataSub1: !Not [!Equals [!Ref DataSubAz1, '']]
   cCreateDataSub2: !Not [!Equals [!Ref DataSubAz2, '']]
   cCreateDataSub3: !Not [!Equals [!Ref DataSubAz3, '']]
@@ -46,15 +54,18 @@ Parameters:
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
   PrivateSubAz1:
     Type: String
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
+    Default: ''
+    AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Private Subnet Cidr for AZ1'
   PrivateSubAz2:
     Type: String
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
+    Default: ''
+    AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Private Subnet Cidr for AZ2'
   PrivateSubAz3:
     Type: String
-    AllowedPattern: '(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
+    Default: ''
+    AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Private Subnet Cidr for AZ3'
   PublicSubAz1:
     Type: String
@@ -322,6 +333,7 @@ Resources:
       AvailabilityZone: !Select ['0', !GetAZs '']
       CidrBlock: !Ref PublicSubAz1
       VpcId: !Ref rMainVPC
+      MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
           Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['0', !GetAZs ''], 'subnet']]
@@ -346,6 +358,7 @@ Resources:
       AvailabilityZone: !Select ['1', !GetAZs '']
       CidrBlock: !Ref PublicSubAz2
       VpcId: !Ref rMainVPC
+      MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
           Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['1', !GetAZs ''], 'subnet']]
@@ -370,6 +383,7 @@ Resources:
       AvailabilityZone: !Select ['2', !GetAZs '']
       CidrBlock: !Ref PublicSubAz3
       VpcId: !Ref rMainVPC
+      MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
           Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['2', !GetAZs ''], 'subnet']]
@@ -459,6 +473,7 @@ Resources:
 
 # Create Private subnets and routes or AZ1, AZ2 and/or AZ3 if requested
   rPrivateSubAz1:
+    Condition: cCreatePrivateSub1
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['0', !GetAZs '']
@@ -482,6 +497,7 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivateSubAz2:
+    Condition: cCreatePrivateSub2
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['1', !GetAZs '']
@@ -505,6 +521,7 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivateSubAz3:
+    Condition: cCreatePrivateSub3
     Type: AWS::EC2::Subnet
     Properties:
       AvailabilityZone: !Select ['2', !GetAZs '']
@@ -591,16 +608,19 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
   rPrivateSubnet1RouteTableAssociation:
+    Condition: cCreatePrivateSub1
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref rPrivateSubRtAz1
       SubnetId: !Ref rPrivateSubAz1
   rPrivateSubnet2RouteTableAssociation:
+    Condition: cCreatePrivateSub2
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref rPrivateSubRtAz2
       SubnetId: !Ref rPrivateSubAz2
   rPrivateSubnet3RouteTableAssociation:
+    Condition: cCreatePrivateSub3
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
       RouteTableId: !Ref rPrivateSubRtAz3
@@ -992,16 +1012,19 @@ Resources:
         From: '-1'
         To: '-1'
   rNaclAssocPrivateSubnet1:
+    Condition: cCreatePrivateSub1
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
       SubnetId: !Ref rPrivateSubAz1
   rNaclAssocPrivateSubnet2:
+    Condition: cCreatePrivateSub2
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
       SubnetId: !Ref rPrivateSubAz2
   rNaclAssocPrivateSubnet3:
+    Condition: cCreatePrivateSub3
     Type: AWS::EC2::SubnetNetworkAclAssociation
     Properties:
       NetworkAclId: !Ref rPrivateTierSubnetsNacl
@@ -1112,31 +1135,37 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-PubRTId'
   PrivateSubnet1Id:
+    Condition: cCreatePrivateSub1
     Description: 'Private Subnet 1 ID'
     Value: !Ref rPrivateSubAz1
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSub1Id'
   PrivateSubnet2Id:
+    Condition: cCreatePrivateSub2
     Description: 'Private Subnet 2 ID'
     Value: !Ref rPrivateSubAz2
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSub2Id'
   PrivateSubnet3Id:
+    Condition: cCreatePrivateSub3
     Description: 'Private Subnet 3 ID'
     Value: !Ref rPrivateSubAz3
     Export:
       Name: !Sub '${AWS::StackName}-PrivateSub3Id'
   PrivateSubnetRouteTableAZ1:
+    Condition: cCreatePrivateSub1
     Description: 'Private Subnet Route Table ID of AZ 1'
     Value: !Ref rPrivateSubRtAz1
     Export:
       Name: !Sub '${AWS::StackName}-PrivRT1Id'
   PrivateSubnetRouteTableAZ2:
+    Condition: cCreatePrivateSub2
     Description: 'Private Subnet Route Table ID of AZ 2'
     Value: !Ref rPrivateSubRtAz2
     Export:
       Name: !Sub '${AWS::StackName}-PrivRT2Id'
   PrivateSubnetRouteTableAZ3:
+    Condition: cCreatePrivateSub2
     Description: 'Private Subnet Route Table ID of AZ 3'
     Value: !Ref rPrivateSubRtAz3
     Export:
