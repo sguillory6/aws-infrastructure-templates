@@ -261,7 +261,7 @@ aws cloudformation deploy \
     'DnsProxyIpAz1=100.65.65.58' \
     'DnsProxyIpAz2=100.65.65.138' \
     'DnsProxyIpAz3=100.65.65.202' \
-    'Ec2KeyPairName=my-key-pair'
+    'Ec2KeyPairName=my-key-pair' \
   --tags \
     'SWA:Name=my-app-dev-us-east-1-dns-stack' \
     'SWA:CostCenter=12345' \
