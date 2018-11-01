@@ -185,37 +185,13 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
 
-  rVpcDefaultSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupName: PreventCreationOfDefaultOpenEgress
-      GroupDescription: Security Group To Prevent Creation Of Default Open Egress
-      SecurityGroupEgress:
-        - !Ref rDefaultSecurityGroupEgress
-      Tags:
-        - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'vpc']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'vpc']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
-      VpcId: !Ref rMainVPC
-
+# Replace egress for the default security group to prevent usage
   rDefaultSecurityGroupEgress:
     Type: AWS::EC2::SecurityGroupEgress
     Properties:
       CidrIp: 0.0.0.0/32
-      Description: Security group to prevent aws from inserting the default SG which is open to 0.0.0.0/0
+      Description: Change of Egress in the Default Security Group to prevent any usage
+      GroupId: !GetAtt rMainVPC.DefaultSecurityGroup
       FromPort: 1
       ToPort: 1
       IpProtocol: tcp
