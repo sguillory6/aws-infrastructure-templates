@@ -941,7 +941,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'true'
+      Egress: 'false'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
@@ -1006,7 +1006,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'true'
+      Egress: 'false'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
@@ -1074,7 +1074,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'true'
+      Egress: 'false'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
