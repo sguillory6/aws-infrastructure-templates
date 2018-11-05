@@ -185,6 +185,17 @@ Resources:
         - Key: SWA:Environment
           Value: !Ref EnvName
 
+# Replace egress for the default security group to prevent usage
+  rDefaultSecurityGroupEgress:
+    Type: AWS::EC2::SecurityGroupEgress
+    Properties:
+      CidrIp: 0.0.0.0/32
+      Description: Change of Egress in the Default Security Group to prevent any usage
+      GroupId: !GetAtt rMainVPC.DefaultSecurityGroup
+      FromPort: 1
+      ToPort: 1
+      IpProtocol: tcp
+
 # Create deafult DHCP Option set for VPC
   rVpcDhcpOptionsAssociation:
     Type: AWS::EC2::VPCDHCPOptionsAssociation
@@ -941,7 +952,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'true'
+      Egress: 'false'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
@@ -1006,7 +1017,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'true'
+      Egress: 'false'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
@@ -1074,7 +1085,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'true'
+      Egress: 'false'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
