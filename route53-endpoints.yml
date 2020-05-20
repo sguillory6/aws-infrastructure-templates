@@ -1,0 +1,115 @@
+# The variables used in the vpc template are named with the following convention
+#   Variables that start with a c are conditions
+#   Variables that start with a r are resources
+#   Variables that do not start with the above are parameters or outputs
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Creates VPC and its base resources, across 3 AZs: VPC, Subnets, Routes tables, and NACLs.'
+
+Parameters:
+  InboundEndpointName:
+    Type: String
+    Description: The Name of the Inbound Endpoint
+  OutboundEndpointName:
+    Type: String
+    Description: The Name of the Outbound Endpoint
+  VpcId:
+    Description: The VPC that all inbound and outbound DNS queries will flow through
+    Type: AWS::EC2::VPC::Id
+
+  PublicSubAz1:
+    Description: The first subnet to deploy the resolver endoints to
+    Type: AWS::EC2::Subnet::Id
+
+  InboundIpAddress1:
+    Description: The fixed IP address for the inbound input in the first subnet
+    Type: String
+    
+  OutboundIpAddress1:
+    Description: The fixed IP address for the outbound input in the first subnet
+    Type: String
+    
+  PublicSubAz2:
+    Description: The second subnet to deploy the resolver endoints to
+    Type: AWS::EC2::Subnet::Id
+
+  InboundIpAddress2:
+    Description: The fixed IP address for the outbound input in the second subnet
+    Type: String
+    
+  OutboundIpAddress2:
+    Description: The fixed IP address for the outbound input in the second subnet
+    Type: String
+    
+  EndpointSecurityGroup:
+    Description: The security group for the inbound endpoint
+    Type: AWS::EC2::SecurityGroup::Id
+
+  TargetIp1:
+    Description: IP address of first on-prem DNS server
+    Type: String
+    
+  TargetIp2:
+    Description: IP address of second on-prem DNS server
+    Type: String
+    
+Resources:
+  rInboundResolverEndpoint:
+    Type: AWS::Route53Resolver::ResolverEndpoint
+    Properties:
+      Name: !Ref InboundEndpointName
+      Direction: INBOUND
+      IpAddresses:
+        - SubnetId: !Ref PublicSubAz1
+          Ip: !Ref InboundIpAddress1
+        - SubnetId: !Ref PublicSubAz2
+          Ip: !Ref InboundIpAddress2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+      Tags:
+        - Key: Owner
+          Value: StanG
+        - Key: Project
+          Value: Route 53 Experiments
+      
+  rOutboundResolverEndpoint:
+    Type: AWS::Route53Resolver::ResolverEndpoint
+    Properties:
+      Name: !Ref OutboundEndpointName
+      Direction: OUTBOUND
+      IpAddresses:
+        - SubnetId: !Ref PublicSubAz1
+        - SubnetId: !Ref PublicSubAz2
+      SecurityGroupIds:
+        - !Ref EndpointSecurityGroup
+      Tags:
+        - Key: Owner
+          Value: StanG
+        - Key: Project
+          Value: Route 53 Experiments
+
+  rResolverRule1:
+    Type: "AWS::Route53Resolver::ResolverRule"
+    Properties:
+      Name: stang-r53-resolver-rule-to-swa
+      DomainName: swacorp.com
+      ResolverEndpointId: !Ref rOutboundResolverEndpoint
+      RuleType: FORWARD
+      Tags:
+        - Key: Owner
+          Value: StanG
+        - Key: Project
+          Value: Route 53 Experiments
+      TargetIps:
+        - Ip: !Ref TargetIp1
+          Port: 53
+        - Ip: !Ref TargetIp2
+          Port: 53
+
+  rResolveRuleAssociation1:
+    Type: "AWS::Route53Resolver::ResolverRuleAssociation"
+    Properties:
+      Name: stang-r53-resolver-rule-to-swa-association
+      ResolverRuleId: !Ref rResolverRule1
+      VPCId: !Ref VpcId
+                                                                                                

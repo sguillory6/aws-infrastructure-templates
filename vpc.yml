@@ -31,21 +31,6 @@ Conditions:
     - !Condition cCreateDataSub2
     - !Condition cCreateDataSub3
 
-  cConfigureDirectConnect: !Equals [!Ref ConfigureDirectConnect, true]
-  cNotLabEnvironment: !Not [!Equals [!Ref EnvName, lab]]
-  cCreateVGW: !And
-    - !Condition cConfigureDirectConnect
-    - !Condition cNotLabEnvironment
-
-  cVGWforPublic: !And
-    - !Condition cCreateVGW
-    - !Condition cCreatePublicResources
-
-  cVGWforData: !And
-    - !Condition cCreateVGW
-    - !Condition cCreateDataResources
-
-
 Parameters:
   VpcCidrBlock:
     Type: String
@@ -97,68 +82,16 @@ Parameters:
     Default: ''
     AllowedPattern: '|(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\/(\d{1,2})'
     Description: 'Data Subnet Cidr for AZ3'
-  ConfigureDirectConnect:
-    Type: String
-    Default: false
-    Description: 'Configure VPC to use Direct Connect'
-    AllowedValues:
-      - true
-      - false
-    ConstraintDescription: 'Must indicate true or false'
-  CsrPreferredPath:
-    Type: String
-    Description: 'The preferred network path VPC to SWA (CSR1, CSR2)'
-    Default: CSR1
-    AllowedValues:
-      - CSR1
-      - CSR2
-  InitiateSpoke:
-    Type: String
-    Description: 'initiate connection to direct connect'
-    Default: true
-    AllowedValues:
-      - true
-      - false
   AppName:
     Type: String
     Description: 'The Name of the Application'
-  EnvName:
-    Type: String
-    Description: 'Environment Name - lab, dev, qa, prod'
-    AllowedValues:
-      - lab
-      - dev
-      - qa
-      - prod
-    ConstraintDescription: 'Must be lab, dev, qa, or prod'
-  SWACostCenter:
-    Type: String
-    Description: 'Cost Center Number (5 digits)'
-    AllowedPattern: '(\d{5})'
-    ConstraintDescription: 'Must be in the format XXXXX (5 digits)'
-  SWAPID:
-    Type: String
-    Description: 'IT-XXXXX... or IO-XXXXX... (minimum 5 digits)'
-    AllowedPattern: '(IT-\d{5,})|(IO-\d{5,})'
-    ConstraintDescription: 'Must be in the format IT-XXXXX... or IO-XXXXX... (minimum 5 digits)'
-  SWAConfidentiality:
-    Type: String
-    Description: 'SWA Public, SWA Internal, SWA Confidential'
-    AllowedValues:
-      - SWA Public
-      - SWA Internal
-      - SWA Confidential
-  SWACompliance:
-    Type: String
-    Description: 'PCI, PII, NA'
-    AllowedValues:
-      - NA
-      - PII
-      - PCI
-  SWABusinessService:
-    Type: String
-    Description: 'Booking, CheckIn, Manage irregular operations'
 
+Mappings:
+  RegionMap: 
+    us-east-1:
+      domainName: ec2.internal
+    us-west-2:
+      domainName: us-west-2.compute.internal
 
 Resources:
 # Create VPC
@@ -169,21 +102,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'vpc']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'vpc']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'vpc']]
 
 # Replace egress for the default security group to prevent usage
   rDefaultSecurityGroupEgress:
@@ -196,47 +115,20 @@ Resources:
       ToPort: 1
       IpProtocol: tcp
 
-# Create deafult DHCP Option set for VPC
+# Create DHCP Options for AmazonprovidedDNS
+  rDhcpOptions: 
+    Type: AWS::EC2::DHCPOptions
+    Properties: 
+      DomainName: !FindInMap [RegionMap, !Ref "AWS::Region", domainName]
+      DomainNameServers: 
+        - AmazonProvidedDNS
+
+# Create default DHCP Option set for VPC
   rVpcDhcpOptionsAssociation:
     Type: AWS::EC2::VPCDHCPOptionsAssociation
     Properties:
-      DhcpOptionsId: default
+      DhcpOptionsId: !Ref rDhcpOptions
       VpcId: !Ref rMainVPC
-
-# Set up VPC for Direct Connect if reuqested
-  rVirtualPrivateGateway:
-    Condition: cCreateVGW
-    Type: AWS::EC2::VPNGateway
-    Properties:
-      Type: 'ipsec.1'
-      Tags:
-        - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'vgw']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'vgw']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
-        - Key: !Join  ['', [!Ref EnvName, '-transitVPC:', !Ref 'AWS::Region', ':preferred-path']]
-          Value: !Ref CsrPreferredPath
-        - Key: !Join  ['', [!Ref EnvName, '-transitVPC:', !Ref 'AWS::Region', ':spoke']]
-          Value: !Ref InitiateSpoke
-
-  rVirtualPrivateGatewayAttachment:
-    Condition: cCreateVGW
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties:
-      VpcId: !Ref rMainVPC
-      VpnGatewayId: !Ref rVirtualPrivateGateway
 
 # Create the NAT Gateways for Private subnets in AZ1, AZ2 and/or AZ3 if needed
   rNatGatewayAz1:
@@ -251,21 +143,7 @@ Resources:
       SubnetId: !Ref rPublicSubAz1
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'natgw1']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'natgw1']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'natgw1']]
   rNatGatewayEipAz1:
     Condition: cCreatePublicSub1
     Type: AWS::EC2::EIP
@@ -283,21 +161,7 @@ Resources:
       SubnetId: !Ref rPublicSubAz2
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'natgw2']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'natgw2']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'natgw2']]
   rNatGatewayEipAz2:
     Condition: cCreatePublicSub2
     Type: AWS::EC2::EIP
@@ -315,21 +179,7 @@ Resources:
       SubnetId: !Ref rPublicSubAz3
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'natgw3']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'natgw3']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'natgw3']]
   rNatGatewayEipAz3:
     Condition: cCreatePublicSub3
     Type: AWS::EC2::EIP
@@ -347,21 +197,7 @@ Resources:
       MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['0', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['0', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'pub', !Select ['0', !GetAZs ''], 'subnet']]
   rPublicSubAz2:
     Condition: cCreatePublicSub2
     Type: AWS::EC2::Subnet
@@ -372,21 +208,7 @@ Resources:
       MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['1', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['1', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'pub', !Select ['1', !GetAZs ''], 'subnet']]
   rPublicSubAz3:
     Condition: cCreatePublicSub3
     Type: AWS::EC2::Subnet
@@ -397,21 +219,7 @@ Resources:
       MapPublicIpOnLaunch: 'true'
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['2', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', !Select ['2', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'pub', !Select ['2', !GetAZs ''], 'subnet']]
   rPublicSubRt:
     Condition: cCreatePublicResources
     Type: AWS::EC2::RouteTable
@@ -419,21 +227,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', 'rt']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'pub', 'rt']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'pub', 'rt']]
   rPublicSubnet1RouteTableAssociation:
     Condition: cCreatePublicSub1
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -460,21 +254,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'igw']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'igw']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'igw']]
   rVpcGatewayAttachment:
     Condition: cCreatePublicResources
     Type: AWS::EC2::VPCGatewayAttachment
@@ -492,21 +272,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['0', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['0', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'priv', !Select ['0', !GetAZs ''], 'subnet']]
   rPrivateSubAz2:
     Condition: cCreatePrivateSub2
     Type: AWS::EC2::Subnet
@@ -516,21 +282,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['1', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['1', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'priv', !Select ['1', !GetAZs ''], 'subnet']]
   rPrivateSubAz3:
     Condition: cCreatePrivateSub3
     Type: AWS::EC2::Subnet
@@ -540,84 +292,28 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['2', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['2', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'priv', !Select ['2', !GetAZs ''], 'subnet']]
   rPrivateSubRtAz1:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['0', !GetAZs ''], 'rt']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['0', !GetAZs ''], 'rt']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'priv', !Select ['0', !GetAZs ''], 'rt']]
   rPrivateSubRtAz2:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['1', !GetAZs ''], 'rt']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['1', !GetAZs ''], 'rt']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'priv', !Select ['1', !GetAZs ''], 'rt']]
   rPrivateSubRtAz3:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['2', !GetAZs ''], 'rt']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'priv', !Select ['2', !GetAZs ''], 'rt']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'priv', !Select ['2', !GetAZs ''], 'rt']]
   rPrivateSubnet1RouteTableAssociation:
     Condition: cCreatePrivateSub1
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -647,21 +343,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', !Select ['0', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', !Select ['0', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'data', !Select ['0', !GetAZs ''], 'subnet']]
   rDataSubAz2:
     Condition: cCreateDataSub2
     Type: AWS::EC2::Subnet
@@ -671,21 +353,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', !Select ['1', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', !Select ['1', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'data', !Select ['1', !GetAZs ''], 'subnet']]
   rDataSubAz3:
     Condition: cCreateDataSub3
     Type: AWS::EC2::Subnet
@@ -695,21 +363,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', !Select ['2', !GetAZs ''], 'subnet']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', !Select ['2', !GetAZs ''], 'subnet']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'data', !Select ['2', !GetAZs ''], 'subnet']]
   rDataSubRt:
     Condition: cCreateDataResources
     Type: AWS::EC2::RouteTable
@@ -717,21 +371,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', 'rt']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, 'data', 'rt']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, 'data', 'rt']]
   rDataSubnet1RouteTableAssociation:
     Condition: cCreateDataSub1
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -760,32 +400,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref rInternetGateway
 
-# Create the Public tier routes (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) back to direct connect
-  rPublicTierInternalAgg1Route:
-    Condition: cVGWforPublic
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPublicSubRt
-      DestinationCidrBlock: 10.0.0.0/8
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPublicTierInternalAgg2Route:
-    Condition: cVGWforPublic
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPublicSubRt
-      DestinationCidrBlock: 172.16.0.0/12
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPublicTierInternalAgg3Route:
-    Condition: cVGWforPublic
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPublicSubRt
-      DestinationCidrBlock: 192.168.0.0/16
-      GatewayId: !Ref rVirtualPrivateGateway
-
 # Create the Private tier default routes (0.0.0.0/0) from each AZ back to NAT gateways
   rPrivateTierDefaultRouteAZ1:
     Condition: cCreatePublicSub1
@@ -809,106 +423,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId: !Ref rNatGatewayAz3
 
-# Create the Private tier routes (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) from each AZ back to direct connect
-  rPrivateTierInternalAgg1RouteAZ1:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz1
-      DestinationCidrBlock: 10.0.0.0/8
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg2RouteAZ1:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz1
-      DestinationCidrBlock: 172.16.0.0/12
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg3RouteAZ1:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz1
-      DestinationCidrBlock: 192.168.0.0/16
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg1RouteAZ2:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz2
-      DestinationCidrBlock: 10.0.0.0/8
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg2RouteAZ2:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz2
-      DestinationCidrBlock: 172.16.0.0/12
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg3RouteAZ2:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz2
-      DestinationCidrBlock: 192.168.0.0/16
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg1RouteAZ3:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz3
-      DestinationCidrBlock: 10.0.0.0/8
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg2RouteAZ3:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz3
-      DestinationCidrBlock: 172.16.0.0/12
-      GatewayId: !Ref rVirtualPrivateGateway
-  rPrivateTierInternalAgg3RouteAZ3:
-    Condition: cCreateVGW
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rPrivateSubRtAz3
-      DestinationCidrBlock: 192.168.0.0/16
-      GatewayId: !Ref rVirtualPrivateGateway
-
-# Create the Data tier routes (10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16) from each AZ back to direct connect
-  rDataTierInternalAgg1Route:
-    Condition: cVGWforData
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rDataSubRt
-      DestinationCidrBlock: 10.0.0.0/8
-      GatewayId: !Ref rVirtualPrivateGateway
-  rDataTierInternalAgg2Route:
-    Condition: cVGWforData
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rDataSubRt
-      DestinationCidrBlock: 172.16.0.0/12
-      GatewayId: !Ref rVirtualPrivateGateway
-  rDataTierInternalAgg3Route:
-    Condition: cVGWforData
-    Type: AWS::EC2::Route
-    DependsOn: rVirtualPrivateGatewayAttachment
-    Properties:
-      RouteTableId: !Ref rDataSubRt
-      DestinationCidrBlock: 192.168.0.0/16
-      GatewayId: !Ref rVirtualPrivateGateway
-
 # Create NACLs for Public subnets
   rPublicTierSubnetsNacl:
     Condition: cCreatePublicResources
@@ -917,21 +431,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'pub', 'nacl']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'pub', 'nacl']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'pub', 'nacl']]
   rPublicTierSubnetsNaclIn:
     Condition: cCreatePublicResources
     Type: AWS::EC2::NetworkAclEntry
@@ -952,7 +452,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'false'
+      Egress: 'true'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
@@ -983,21 +483,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'priv', 'nacl']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'priv', 'nacl']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'priv', 'nacl']]
   rPrivateTierSubnetsNaclIn:
     Type: AWS::EC2::NetworkAclEntry
     Properties:
@@ -1017,7 +503,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'false'
+      Egress: 'true'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
@@ -1049,21 +535,7 @@ Resources:
       VpcId: !Ref rMainVPC
       Tags:
         - Key: Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'data', 'nacl']]
-        - Key: SWA:Name
-          Value: !Join ['-', [!Ref AppName, !Ref EnvName, !Ref 'AWS::Region', 'data', 'nacl']]
-        - Key: SWA:SWACostCenter
-          Value: !Ref SWACostCenter
-        - Key: SWA:PID
-          Value: !Ref SWAPID
-        - Key: SWA:Confidentiality
-          Value: !Ref SWAConfidentiality
-        - Key: SWA:Compliance
-          Value: !Ref SWACompliance
-        - Key: SWA:BusinessService
-          Value: !Ref SWABusinessService
-        - Key: SWA:Environment
-          Value: !Ref EnvName
+          Value: !Join ['-', [!Ref AppName, !Ref 'AWS::Region', 'data', 'nacl']]
   rDataTierSubnetsNaclIn:
     Condition: cCreateDataResources
     Type: AWS::EC2::NetworkAclEntry
@@ -1085,7 +557,7 @@ Resources:
       RuleNumber: '100'
       Protocol: '-1'
       RuleAction: 'allow'
-      Egress: 'false'
+      Egress: 'true'
       CidrBlock: '0.0.0.0/0'
       PortRange:
         From: '-1'
