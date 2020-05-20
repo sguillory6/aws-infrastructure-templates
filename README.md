@@ -1,6 +1,6 @@
-# SWA Infrastructure Templates
+# My Infrastructure Templates
 
-This repository contains the SWA sanctioned CloudFormation templates that can be used to create the infrastructure resources
+This repository contains the My sanctioned CloudFormation templates that can be used to create the infrastructure resources
 needed to support application development in AWS accounts.
 
 ## Template Variable Naming Convention
@@ -21,7 +21,7 @@ The VPC template will generate the following resources:
 * VPC
 * Public subnets in up to 3 AZs (availability zones) - Used for access to services from public internet and host the NAT Gateway
   for servers in private subnets to access internet.
-* Private subnets in up to 3 AZs - Used for services that will only be accessed from SWA or public subnets.
+* Private subnets in up to 3 AZs - Used for services that will only be accessed from My or public subnets.
 * Data subnets in up to 3 AZs - Used for running data services such as RDS or Gemfire. Should only be accessible from private subnets.
 * Route tables and default entries for each subnet created
 * NACLs
@@ -47,12 +47,6 @@ aws cloudformation deploy \
     'VpcCidrBlock=100.65.65.0/24' \
     'AppName=my-app' \
     'EnvName=dev' \
-    'SWACostCenter=12345' \
-    'SWAPID=IT-00000' \
-    'SWAConfidentiality=SWA Confidential' \
-    'SWACompliance=PII' \
-    'SWABusinessService=CheckIn' \
-    'ConfigureDirectConnect=false' \
     'PublicSubAz1=100.65.65.0/28' \
     'PrivateSubAz1=100.65.65.16/28' \
     'DataSubAz1=100.65.65.32/28' \
@@ -62,14 +56,6 @@ aws cloudformation deploy \
     'PublicSubAz3=100.65.65.144/28' \
     'PrivateSubAz3=100.65.65.160/28' \
     'DataSubAz3=100.65.65.176/28' \
-  --tags \
-    'SWA:Name=my-app-dev-us-east-1-vpc-stack' \
-    'SWA:CostCenter=12345' \
-    'SWA:PID=IT-00000' \
-    'SWA:Confidentiality=SWA Confidential' \
-    'SWA:Compliance=PII' \
-    'SWA:BusinessService=CheckIn' \
-    'SWA:Environment=dev'
 ```
 
 You will need to replace the following parameters with valid values:
@@ -77,14 +63,6 @@ You will need to replace the following parameters with valid values:
 * `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-vpc-stack
 * `s3-bucket` - The name of a valid S3 bucket that can be used to upload the vpc template in order to create the stack
 * `parameter-overrides` - see **VPC Parameters** section below
-* `tags`
-  * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-vpc-stack
-  * `SWA:CostCenter` - The cost center for this application (5 digits)
-  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
-  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
-  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
-  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
-  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
 
 ### VPC Parameters
 
@@ -97,7 +75,6 @@ In order for instances in the private subnets to be able to communicate to the i
 a public subnet must exist for each private subnet in each AZ.
 
 **WARNINGS!!! VERY IMPORTANT**
-* **If connecting this VPC to Direct Connect, the CIDR MUST BE PROVIDED by the SWA Network Engineering team or this WILL create network outages.**
 * **If connecting this VPC to Direct Connect, do not use the same CIDR block in multiple VPCs or this WILL create network outages.**
 * **Do not attempt to use Direct Connect in a lab environment.**
 
@@ -106,11 +83,6 @@ a public subnet must exist for each private subnet in each AZ.
 | VpcCidrBlock | VPC CIDR Block | Valid CIDR x.x.x.x/x | **true** | N/A |
 | AppName | Name of the Application | String with no white space e.g. my-app | **true** | N/A |
 | EnvName | Environment Name | **lab**, **dev**, **qa** or **prod** | **true** | N/A |
-| SWACostCenter | Cost Center Number (5 digits) | XXXXXX | **true** | N/A |
-| SWAPID | SWA PID | IT-XXXXX... or IO-XXXXX... (minimum 5 digits) | **true** | N/A |
-| SWAConfidentiality | Confidentiality of application data | SWA Public, SWA Internal or SWA Confidential | **true** | N/A |
-| SWACompliance | Compliance required for application | PCI, PII or NA | **true** | N/A |
-| SWABusinessService | Business service of application | Booking, CheckIn, Manage irregular operations, etc... | **true** | N/A |
 | PrivateSubAz1 | Private Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x | **true** | N/A |
 | PrivateSubAz2 | Private Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x | **true** | N/A |
 | PrivateSubAz3 | Private Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x | **true** | N/A |
@@ -120,9 +92,6 @@ a public subnet must exist for each private subnet in each AZ.
 | DataSubAz1 | Data Tier Subnet Cidr Block - AZ1 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz2 | Data Tier Subnet Cidr Block - AZ2 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
 | DataSubAz3 | Data Tier Subnet Cidr Block - AZ3 | Valid CIDR x.x.x.x/x<br>If no value passed, subnet will not be created. | false | Empty String |
-| ConfigureDirectConnect | Configure resources to use Direct Connect | **true** or **false**<br><br>If lab environment, DX will never be created | false | false |
-| CsrPreferredPath | The preferred network path between VPC and SWA | **CSR1** or **CSR2** | false | CSR1 |
-| InitiateSpoke | Create connection to direct connect | **true** or **false** | false | true |
 
 ### VPC Outputs
 
@@ -150,15 +119,6 @@ After the VPC stack has been generated, you will have the following outputs avai
 
 ### Deleting VPC Stack
 
-When deleting the VPC stack, if you have Direct Connect enabled, you will need to delete existing VPN connections before AWS will allow you to delete the VPC stack.
-To delete the VPN connections, the **spoke** tag on the VGW will need to be set to **false** and you will need to wait for connections to be deleted before attempting to delete the stack.
-```
-# Changing the flag using CLI when you've just the one VPN Gateway
-env=`aws ec2 describe-tags --filters "Name=resource-id,Values=$ID" "Name=key,Values=SWA:Environment" | jq -r .Tags[].Value`
-resource_id=`aws ec2 describe-vpn-gateways |jq -r .VpnGateways[].VpnGatewayId` # Add filter to just get the one you care
-aws ec2 create-tags --resources ${resource_id}  --tags "Key=${ENV}-transitVPC:${AWS_DEFAULT_REGION}:spoke,Value=false"
-```
-
 You will also need to delete any resources that were created in the VPC prior to deleting the VPC stack.
 
 ## Route53
@@ -174,30 +134,14 @@ aws cloudformation deploy \
   --stack-name my-app-dev-us-east-1-route53-stack \
   --template-file route53.yml \
   --parameter-overrides \
-    'HostedZoneName=myapp.swacorp.com' \
+    'HostedZoneName=myapp.example.com' \
     'VpcId=vpc-04d5960409f999d49' \
-  --tags \
-    'SWA:Name=my-app-dev-us-east-1-route53-stack' \
-    'SWA:CostCenter=12345' \
-    'SWA:PID=IT-00000' \
-    'SWA:Confidentiality=SWA Confidential' \
-    'SWA:Compliance=PII' \
-    'SWA:BusinessService=CheckIn' \
-    'SWA:Environment=dev'
 ```
 
 You will need to replace the following parameters with valid values:
 
 * `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-route53-stack
 * `parameter-overrides` - see **Route53 Parameters** section below
-* `tags`
-  * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-route53-stack
-  * `SWA:CostCenter` - The cost center for this application (5 digits)
-  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
-  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
-  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
-  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
-  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
 
 ### Route53 Parameters
 
@@ -205,7 +149,7 @@ In order to create the Private Hosted Zone these parameters will need to be pass
 
 | Parameter | Description | Format | Required | Default value |
 |-----------|-------------|--------|----------|---------------|
-| HostedZoneName | The fully qualified domain name used to create the private hosted zone | ...xxx.swacorp.com | **true** | N/A |
+| HostedZoneName | The fully qualified domain name used to create the private hosted zone | ...xxx.example.com | **true** | N/A |
 | VpcId | The VPC ID to associate to the private hosted zone| vpc-xxxxxxxxxxxxxxxxx | **true** | N/A |
 
 ### Route53 Outputs
@@ -224,108 +168,4 @@ When deleting the Route53 stack, you will need to remove any additional RecordSe
 
 ## DNS
 
-The `dns.yml` template can be used to create the DNS solution to support DNS between SWA and accounts in AWS.
-
-The DNS template will generate the following resources:
-
-* An Elastic Network Interface (ENI) in each AZ created with static IPs to be used by the unbound servers 
-* An Auto Scaling Group (ASG) in each AZ that launches the unbound servers
-* Launch configurations in each AZ that are used by the ASGs to launch and configure the unbound servers
-* A DHCP Option Set that points to all the ENIs that is associated to the VPC
-* Security groups that allow access to the unbound servers for SSH and DNS
-
-### Creating DNS stack
-
-The following is an example of how to use the CloudFormation template to generate the DNS solution.
-
-```bash
-aws cloudformation deploy \
-  --stack-name my-app-dev-us-east-1-dns-stack \
-  --template-file dns.yml \
-  --s3-bucket my-bucket \
-  --s3-prefix dns-template \
-  --capabilities CAPABILITY_IAM \
-  --parameter-overrides \
-    'VpcId=vpc-04d5960409f999d49' \
-    'AppName=my-app' \
-    'EnvName=dev' \
-    'SWACostCenter=12345' \
-    'SWAPID=IT-00000' \
-    'SWAConfidentiality=SWA Confidential' \
-    'SWACompliance=PII' \
-    'SWABusinessService=CheckIn' \
-    'HostedZoneName=myapp.swacorp.com' \
-    'SubnetIdAz1=subnet-0ec539a639eade280' \
-    'SubnetIdAz2=subnet-082973d0b5fe54a77' \
-    'SubnetIdAz3=subnet-0a7f218446a9cabfe' \
-    'DnsProxyIpAz1=100.65.65.58' \
-    'DnsProxyIpAz2=100.65.65.138' \
-    'DnsProxyIpAz3=100.65.65.202' \
-    'Ec2KeyPairName=my-key-pair' \
-  --tags \
-    'SWA:Name=my-app-dev-us-east-1-dns-stack' \
-    'SWA:CostCenter=12345' \
-    'SWA:PID=IT-00000' \
-    'SWA:Confidentiality=SWA Confidential' \
-    'SWA:Compliance=PII' \
-    'SWA:BusinessService=CheckIn' \
-    'SWA:Environment=dev'
-```
-
-You will need to replace the following parameters with valid values
-
-* `stack-name` - *\<app-name>*-*\<env>*-*\<region>*-dns-stack
-* `s3-bucket` - The name of a valid S3 bucket that can be used to upload the VPC template in order to create the stack
-* `parameter-overrides` - see **DNS Parameters** section below
-* `tags`
-  * `SWA:Name` - *\<app-name>*-*\<env>*-*\<region>*-dns-stack
-  * `SWA:CostCenter` - The cost center for this application (5 digits)
-  * `SWA:PID` - The PID for this application (IT-xxxxx... or IO-xxxxx...)
-  * `SWA:Confidentiality` - Confidentiality of application data - SWA Public, SWA Internal or SWA Confidential
-  * `SWA:Compliance` - Compliance required for application - PCI, PII or NA
-  * `SWA:BusinessService` - Business service of application - Booking, CheckIn, Manage irregular operations, etc...
-  * `SWA:Environment` - The environment - **lab**, **dev**, **qa** or **prod**
-
-### DNS Parameters
-
-| Parameter | Description | Format | Required | Default value |
-|-----------|-------------|--------|----------|---------------|
-| VpcId | The VPC ID to of the VPC used to create the DNS resources | vpc-xxxxxxxxxxxxxxxxx | **true** | N/A |
-| AppName | Name of the Application | String with no white space e.g. "my-app" | **true** | N/A |
-| EnvName | Environment Name | **lab**, **dev**, **qa** or **prod** | **true** | N/A |
-| SWACostCenter | Cost Center Number (5 digits) | XXXXX | **true** | N/A |
-| SWAPID | SWA PID | IT-XXXXX... or IO-XXXXX... (minimum 5 digits) | **true** | N/A |
-| SWAConfidentiality | Confidentiality of application data | SWA Public, SWA Internal or SWA Confidential | **true** | N/A |
-| SWACompliance | Compliance required for application | PCI, PII or NA | **true** | N/A |
-| SWABusinessService | Business service of application | Booking, CheckIn, Manage irregular operations, etc... | **true** | N/A |
-| HostedZoneName | Enter the name of the Route 53 private hosted zone. | ...xxx.swacorp.com | **true** | N/A |
-| SubnetIdAz1 | Id of the subnet to launch the DNS instance in AZ 1 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
-| SubnetIdAz2 | Id of the subnet to launch the DNS instance in AZ 2 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
-| SubnetIdAz3 | Id of the subnet to launch the DNS instance in AZ 3 | subnet-xxxxxxxxxxxxxxxxx | **true** | N/A |
-| DnsProxyIpAz1 | Enter a static IP from the AZ 1 subnet to use when launching the DNS proxy instance<br>This must be a valid IP from the `SubnetIdAz1` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
-| DnsProxyIpAz2 | Enter a static IP from the AZ 2 subnet to use when launching the DNS proxy instance<br>This must be a valid IP from the `SubnetIdAz2` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
-| DnsProxyIpAz3 | Enter a static IP from the AZ 3 subnet to use when launching the DNS proxy instance<br>This must be a valid IP from the `SubnetIdAz3` subnet | xxx.xxx.xxx.xxx | **true** | N/A |
-| Ec2KeyPairName | Enter the key-pair name by which you will access the instances created. | Valid EC2 key-pair name | **true** | N/A |
-| InstanceType | Instance class used for DNS servers | t2.micro<br>t2.small<br>t2.medium<br>t2.large<br>t2.xlarge<br>m4.large<br>m4.xlarge | false | t2.micro |
-| DnsInstanceVolumeSize | Enter the disk volume size (in GB) for the DNS proxy instances. | Natural number | false | 10 |
-| OnPremDomain | Enter the name of the on-premises domain. SWA internal domain. | swacorp.com | false | swacorp.com |
-| OnPremDns1 | Enter the IP address of a primary on-premises DNS resolver (name server). | xxx.xxx.xxx.xxx | false | 172.31.10.11 |
-| OnPremDns2 | Enter the IP address of a secondary on-premises DNS resolver (name server). | xxx.xxx.xxx.xxx | false | 172.31.10.10 |
-
-### DNS Outputs
-
-After the DNS stack has been generated, you will have the following outputs available for use in other CloudFormation templates.
-`dns-stack-name` indicates that the export key will start with the name that was given to DNS stack.
-
-| Output Key | Export Key | Description |
-|------------|------------|-------------|
-| DnsProxyIpAz1 | *\<dns-stack-name>*-DnsProxyIpAz1 | The static IP of the DNS proxy located in AZ 1 |
-| DnsProxyIpAz2 | *\<dns-stack-name>*-DnsProxyIpAz2 | The static IP of the DNS proxy located in AZ 2 |
-| DnsProxyIpAz3 | *\<dns-stack-name>*-DnsProxyIpAz3 | The static IP of the DNS proxy located in AZ 3 |
-
-### DNS Usage
-
-All the EC2 instances created in the VPC (after the stack is deployed correctly and the DNS servers are available and ready to serve) will have these DNS servers configured to resolve on prem and aws hosted domains.
-All EC2 instances created prior to deployment of this stack must have resolver reconfigured to use these DNS servers.
-For On Prem servers to resolve the AWS resources, you must submit a DASH request to have SWA DNS configured to forward requests to these DNS servers. Please contact Enterprise Cloud team for additional help.
 
